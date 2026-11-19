@@ -4,7 +4,7 @@
 
 ## Rama de trabajo
 
-El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Una vez aprobado, el PR se hace merge a `refactor/capa-integration`. Solo al final, con los 4 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
+El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Por temas de tiempo no se espera aprobación formal del PR: si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con los 4 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
 
 ## Objetivo
 
