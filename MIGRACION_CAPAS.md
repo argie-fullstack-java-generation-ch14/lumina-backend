@@ -338,7 +338,107 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] Mergear `refactor/capa-integration` a `main`.
 - [ ] Eliminar paquetes viejos una vez vacíos.
 
-## Verificación final de integración
+## Integración y validación (Argie)
+
+**Responsable:** Argie (además del Rol C — Servicios y DTOs de entrada)  
+**Cuándo:** Después de que los 4 PR (A, B, C, D) estén aprobados y mergeados en la rama base `refactor/capa-integration`.
+
+> **Importante:** Cada integrante abre su PR hacia la rama base `refactor/capa-integration`, **no hacia `main`**. La integración y el merge a `main` son tareas exclusivas de esta etapa final, a cargo de Argie.
+
+### Paso 1: Unir los PR en orden A → B → C → D
+
+1. Verificar que los PR de los roles A, B, C y D estén aprobados.
+2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D**.
+3. Hacer pull de la rama de integración:
+
+```bash
+git switch refactor/capa-integration
+git pull
+```
+
+### Paso 2: Ejecutar el build completo
+
+```bash
+mvn -q -DskipTests package
+```
+
+### Paso 3: Verificar que no queden paquetes viejos
+
+```bash
+grep -REn "package com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
+grep -REn "import com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
+```
+
+### Paso 4: Verificar la estructura de directorios
+
+```bash
+find src/main/java/com/lumina -maxdepth 3 -type d | sort
+```
+
+Debe mostrar: `config`, `controller`, `dto`, `dto/request`, `dto/response`, `cors`, `exception`, `model`, `repository`, `service` (y opcionalmente `util`).
+
+### Paso 5: Smoke test final (H2)
+
+1. Ejecutar la aplicación con perfil H2:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=h2 -Dspring-boot.run.arguments=--server.port=18080
+```
+
+2. Probar en orden:
+   - `POST /api/registro`
+   - `POST /api/productos` con `category` como texto
+   - `POST /api/pedidos`
+   - `PUT /api/pedidos/{id}/estado` con `{"status":"CONFIRMED"}`
+   - `POST /api/velas-personalizadas`
+   - `GET /api/productos?categoria=navidad`
+
+3. Resultado esperado: mismos valores funcionales que antes de la migración.
+
+### Paso 6: Validar la documentación (`README.md`)
+
+1. Abrir `README.md` en la raíz del backend.
+2. Verificar que la sección de estructura del proyecto refleje los nuevos paquetes por capas:
+
+```
+src/main/java/com/lumina
+├── LuminaApiApplication.java
+├── config/
+├── controller/
+├── dto/
+│   ├── request/
+│   └── response/
+├── cors/
+├── exception/
+├── model/
+├── repository/
+└── service/
+```
+
+3. Verificar que el flujo de dependencias entre capas esté documentado correctamente.
+4. Guardar los cambios si es necesario.
+
+### Paso 7: Merge a `main`
+
+Si el build y el smoke test pasan, fusionar `refactor/capa-integration` a `main`:
+
+```bash
+git switch main
+git pull
+git merge --no-ff refactor/capa-integration
+git push origin main
+```
+
+### Paso 8: Limpieza — eliminar paquetes viejos
+
+Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
+
+- `usuario`
+- `producto`
+- `pedido`
+- `vela`
+- `common`
+
 
 ```bash
 # Build
