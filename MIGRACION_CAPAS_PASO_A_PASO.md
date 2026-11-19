@@ -29,42 +29,6 @@ Este documento detalla, paso a paso y a profundidad, las actividades de cada uno
 | 4 | Difícil: muchos imports cruzados y riesgo alto de dejar referencias viejas. |
 | 5 | Muy difícil: coordina a todo el equipo, integra, compila y prueba el sistema completo. |
 
-## Estrategia de ramas
-
-1. El responsable de integración crea la rama base desde `main`:
-
-```bash
-git switch main
-git pull
-git switch -c refactor/capa-integration
-git push -u origin refactor/capa-integration
-```
-
-2. Cada integrante crea su rama desde `refactor/capa-integration`:
-
-```bash
-git switch refactor/capa-integration
-git pull
-git switch -c refactor/capa-modelo
-```
-
-Nombres sugeridos:
-
-| Rol | Rama |
-|-----|------|
-| A | `refactor/capa-modelo` |
-| B | `refactor/capa-persistencia` |
-| C | `refactor/capa-servicios` |
-| D | `refactor/capa-api` |
-
-3. Cada integrante trabaja solo en los archivos de su rol.
-4. Cada integrante hace commit en su rama y abre un PR (solicitud de cambio en Git) hacia `refactor/capa-integration`.
-5. El responsable de integración une los 4 PR en este orden recomendado: A, B, C, D.
-6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
-7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
-
----
-
 ## Reglas generales (aplican a todos los roles)
 
 - No renombrar clases, métodos, records, enums ni constructores.
