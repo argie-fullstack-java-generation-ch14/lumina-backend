@@ -2,9 +2,38 @@
 
 **Estado:** planificado, sin ejecutar.
 
-## Rama de trabajo
+## Estrategia de ramas y Git
 
-El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con los 4 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
+1. El responsable de integración crea la rama base desde `main`:
+
+   ```bash
+   git switch main
+   git pull
+   git switch -c refactor/capa-integration
+   git push -u origin refactor/capa-integration
+   ```
+
+2. Cada integrante crea su rama desde `refactor/capa-integration`:
+
+   ```bash
+   git switch refactor/capa-integration
+   git pull
+   git switch -c refactor/capa-modelo   # ejemplo para el Rol A
+   ```
+
+3. Nombres sugeridos de rama:
+
+   | Rol | Rama |
+   |-----|------|
+   | A | `refactor/capa-modelo` |
+   | B | `refactor/capa-persistencia` |
+   | C | `refactor/capa-servicios` |
+   | D | `refactor/capa-api` |
+
+4. Cada integrante trabaja solo en los archivos de su rol y abre un PR hacia `refactor/capa-integration`.
+5. Argie (Rol C) une los 4 PR en este orden recomendado: **A, B, C, D**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
+6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
+7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
 
 ## Objetivo
 
@@ -273,39 +302,6 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 | **C** | Servicios + DTOs de entrada | 4 servicios + 8 DTOs request | `com.lumina.service`, `com.lumina.dto.request` | Argie |
 | **D** | Controladores + DTOs de salida | 4 controladores + 3 DTOs response + `ApiError` | `com.lumina.controller`, `com.lumina.dto.response` | Naya |
 | **Integración** | Build, smoke test, merge a `main`, revisión de `README.md` vs estructura final | Unir PRs A→B→C→D, ejecutar build, ejecutar smoke test, validar documentación, merge a `main`, limpiar paquetes viejos | `com.lumina` (raíz) + documentación | Argie |
-
-### Estrategia de ramas y Git
-
-1. El responsable de integración crea la rama base desde `main`:
-
-   ```bash
-   git switch main
-   git pull
-   git switch -c refactor/capa-integration
-   git push -u origin refactor/capa-integration
-   ```
-
-2. Cada integrante crea su rama desde `refactor/capa-integration`:
-
-   ```bash
-   git switch refactor/capa-integration
-   git pull
-   git switch -c refactor/capa-modelo   # ejemplo para el Rol A
-   ```
-
-3. Nombres sugeridos de rama:
-
-   | Rol | Rama |
-   |-----|------|
-   | A | `refactor/capa-modelo` |
-   | B | `refactor/capa-persistencia` |
-   | C | `refactor/capa-servicios` |
-   | D | `refactor/capa-api` |
-
-4. Cada integrante trabaja solo en los archivos de su rol y abre un PR hacia `refactor/capa-integration`.
-5. Argie (Rol C) une los 4 PR en este orden recomendado: **A, B, C, D**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
-6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
-7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
 
 ### Reglas para evitar conflictos y errores de compilación
 
