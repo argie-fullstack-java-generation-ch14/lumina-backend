@@ -285,7 +285,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
    | D | `refactor/capa-api` |
 
 4. Cada integrante trabaja solo en los archivos de su rol y abre un PR hacia `refactor/capa-integration`.
-5. Argie (Rol C) une los 4 PR en este orden recomendado: **A, B, C, D**.
+5. Argie (Rol C) une los 4 PR en este orden recomendado: **A, B, C, D**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
 6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
 7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
 
