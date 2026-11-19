@@ -2,6 +2,10 @@
 
 **Estado:** planificado, sin ejecutar.
 
+## Rama de trabajo
+
+El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Una vez aprobado, el PR se hace merge a `refactor/capa-integration`. Solo al final, con los 4 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
+
 ## Objetivo
 
 Reorganizar el backend de Lumina desde paquetes por dominio (`usuario`, `producto`, `pedido`, `vela`, `common`) hacia una arquitectura por capas (layered architecture), sin cambiar:
