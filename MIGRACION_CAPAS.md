@@ -2,6 +2,10 @@
 
 **Estado:** planificado, sin ejecutar.
 
+## Rama de trabajo
+
+El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con los 4 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
+
 ## Estrategia de ramas y Git
 
 1. El responsable de integración crea la rama base desde `main`:
