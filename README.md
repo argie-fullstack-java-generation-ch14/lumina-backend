@@ -4,7 +4,7 @@ API REST de Lumina hecha con Spring Boot, Spring Data JPA y MySQL.
 
 ## Qué necesitas
 
-- JDK 17 o superior
+- JDK 21
 - MySQL 8 (o ninguno, si pruebas con el perfil `h2`)
 - Maven (IntelliJ y VS Code con el Extension Pack for Java ya lo traen)
 
