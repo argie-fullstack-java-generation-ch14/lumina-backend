@@ -2,6 +2,17 @@
 
 Este documento complementa a `MIGRACION_MVC.md`. Aquí está el detalle operativo, archivo por archivo, para que cada integrante ejecute su rol sin improvisar. El contrato de nombres, firmas y paquetes sigue siendo el de `MIGRACION_MVC.md`; si hay conflicto entre los dos documentos, manda el contrato.
 
+## Acceso rápido
+
+> Las ramas de cada rol nacen de `refactor/mvc-integration`. Todos los PR y merges van a esa rama, no a `main`.
+
+| Rol | Responsabilidad | Dificultad | Ir a la sección | Integrante |
+|---|---|---|---|---|
+| [Rol A](#rol-a) | Modelo y utilidades | 2 de 5 | [Paso a paso](#rol-a) | Pedro |
+| [Rol B](#rol-b) | Persistencia, excepciones y configuración | 3 de 5 | [Paso a paso](#rol-b) | Nicole |
+| [Rol C](#rol-c) | Servicios y DTOs de entrada | 4 de 5 | [Paso a paso](#rol-c) | Argie |
+| [Rol D](#rol-d) | Controladores, DTOs de salida, documentación e integración | 3 de 5 | [Paso a paso](#rol-d) | Naya |
+
 ## Cómo usar este documento
 
 1. Lee primero `MIGRACION_MVC.md`, secciones **Contrato de paquetes** y **Contrato interno de nombres y firmas**.
@@ -22,7 +33,9 @@ Este documento complementa a `MIGRACION_MVC.md`. Aquí está el detalle operativ
 
 ---
 
-## Rol A: modelo y utilidades — Dificultad 2 de 5
+<a id="rol-a" name="rol-a"></a>
+
+## Rol A: modelo y utilidades — Dificultad 2 de 5 — Pedro
 
 **Objetivo:** mover las 7 entidades/enum a `com.lumina.model` y `SlugUtil` a `com.lumina.util`.
 
@@ -131,7 +144,9 @@ Abre el PR hacia `refactor/mvc-integration`.
 
 ---
 
-## Rol B: persistencia, excepciones y configuración — Dificultad 3 de 5
+<a id="rol-b" name="rol-b"></a>
+
+## Rol B: persistencia, excepciones y configuración — Dificultad 3 de 5 — Nicole
 
 **Objetivo:** mover 6 repositorios a `com.lumina.repository`, 5 clases de excepciones a `com.lumina.exception` y actualizar los imports de `DataInitializer` sin moverlo.
 
@@ -290,7 +305,9 @@ Abre el PR hacia `refactor/mvc-integration`.
 
 ---
 
-## Rol C: servicios y DTOs de entrada — Dificultad 4 de 5
+<a id="rol-c" name="rol-c"></a>
+
+## Rol C: servicios y DTOs de entrada — Dificultad 4 de 5 — Argie
 
 **Objetivo:** mover 4 servicios a `com.lumina.service` y 8 DTOs de entrada a `com.lumina.dto.request`.
 
@@ -500,7 +517,9 @@ Abre el PR hacia `refactor/mvc-integration`.
 
 ---
 
-## Rol D: controladores, DTOs de salida, documentación e integración — Dificultad 3 de 5
+<a id="rol-d" name="rol-d"></a>
+
+## Rol D: controladores, DTOs de salida, documentación e integración — Dificultad 3 de 5 — Naya
 
 **Objetivo:** mover 4 controladores a `com.lumina.controller`, 3 DTOs de salida a `com.lumina.dto.response`, actualizar la documentación y actuar como responsable de integración.
 
