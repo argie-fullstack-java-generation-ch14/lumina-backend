@@ -212,6 +212,24 @@ controller  →  service  →  repository  →  model
 
 **Prohibido:** dependencias hacia atrás (ej. service no llama a controller; repository no llama a service).
 
+## Guía rápida para llamadas entre roles
+
+Esta tabla evita preguntar "¿cómo se va a llamar?" o "¿en qué paquete queda?".
+
+| Necesidad | Contrato final | Import final |
+|---|---|---|
+| Pedido necesita validar/cargar usuario | `UserService.getUser(Long): AppUser` | `com.lumina.service.UserService` |
+| Pedido necesita leer producto | `ProductRepository.findById(Long): Optional<Product>` | `com.lumina.repository.ProductRepository` |
+| Pedido necesita producto por servicio | `ProductService.findById(Long): Product` | `com.lumina.service.ProductService` |
+| Pedido necesita el tipo de vela personalizada | `CustomCandle` | `com.lumina.model.CustomCandle` |
+| Vela necesita cargar usuario | `UserService.getUser(Long): AppUser` | `com.lumina.service.UserService` |
+| `DataInitializer` necesita roles | `RoleRepository.findByName(String): Optional<Role>` | `com.lumina.repository.RoleRepository` |
+| `GlobalExceptionHandler` necesita el error | `ApiError.of(int, String, String, List<String>): ApiError` | `com.lumina.dto.response.ApiError` |
+| Un servicio necesita lanzar errores | `BadRequestException`, `ConflictException`, `ResourceNotFoundException`, `UnauthorizedException` | `com.lumina.exception.*` |
+| `ProductService` necesita slug | `SlugUtil.toSlug(String): String` | `com.lumina.util.SlugUtil` |
+| `OrderService` necesita respuesta de pedido | `OrderResponse.from(UserOrder, List<OrderItem>): OrderResponse` | `com.lumina.dto.response.OrderResponse` |
+| `UserService` necesita respuesta de usuario | `UserResponse.from(AppUser): UserResponse` | `com.lumina.dto.response.UserResponse` |
+
 ## Pasos de migración (orden recomendado)
 
 La migración es **atómica para el compilador**: el build fallará hasta que todas las capas estén integradas. Se recomienda hacer la migración en una rama de integración y unir los cambios en este orden:
@@ -303,13 +321,13 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 
 ### Checklist rápido por rol
 
-## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-a)
+## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-a)
 - [ ] 7 entidades en `com.lumina.model` con `package` actualizado.
 - [ ] `SlugUtil` en `com.lumina.util`.
 - [ ] Quitar imports de clases que ahora están en el mismo paquete `model`.
 - [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`.
 
-## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-b)
+## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-b)
 - [ ] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`.
 - [ ] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`.
 - [ ] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`.
@@ -317,13 +335,13 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
 - [ ] Sin imports de `com.lumina.common` en archivos de este rol.
 
-## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-c)
+## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-c)
 - [ ] 4 servicios en `com.lumina.service`.
 - [ ] 8 DTOs request en `com.lumina.dto.request`.
 - [ ] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`.
 - [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`.
 
-## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-d)
+## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d)
 - [ ] 4 controladores en `com.lumina.controller`.
 - [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
 - [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
@@ -438,21 +456,6 @@ Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 - `pedido`
 - `vela`
 - `common`
-
-
-```bash
-# Build
-mvn -q -DskipTests package
-
-# No quedar paquetes viejos
-grep -REn "package com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
-grep -REn "import com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
-
-# Estructura esperada
-find src/main/java/com/lumina -maxdepth 3 -type d | sort
-```
-
-Debe mostrar: `config`, `controller`, `dto`, `dto/request`, `dto/response`, `cors`, `exception`, `model`, `repository`, `service` (y opcionalmente `util`).
 
 ## Smoke test final (H2)
 
