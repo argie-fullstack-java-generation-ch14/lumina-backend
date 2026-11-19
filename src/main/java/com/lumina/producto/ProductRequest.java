@@ -21,8 +21,9 @@ public record ProductRequest(
     @Size(max = 500, message = "La URL de la imagen es muy larga.")
     String imageUrl,
 
-    @NotNull(message = "La categoría es obligatoria.")
-    Long categoryId,
+    @NotBlank(message = "La categoría es obligatoria.")
+    @Size(max = 80, message = "La categoría es muy larga.")
+    String category,
 
     @Size(max = 120, message = "El aroma es muy largo.")
     String scent,

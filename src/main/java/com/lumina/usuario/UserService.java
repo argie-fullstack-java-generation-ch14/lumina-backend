@@ -78,7 +78,7 @@ public class UserService {
     users.delete(getUser(id));
   }
 
-  // También lo usan otros servicios (favoritos, pedidos...)
+  // También lo usan otros servicios (pedidos, velas personalizadas...)
   public AppUser getUser(Long id) {
     return users.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("No existe el usuario " + id + "."));

@@ -14,7 +14,6 @@ public record OrderResponse(
     BigDecimal discountTotal,
     BigDecimal taxTotal,
     BigDecimal total,
-    String couponCode,
     LocalDateTime createdAt,
     List<Item> items) {
 
@@ -30,17 +29,15 @@ public record OrderResponse(
             item.getQuantity(),
             item.getLineTotal()))
         .toList();
-    String couponCode = order.getCoupon() == null ? null : order.getCoupon().getCode();
     return new OrderResponse(
         order.getId(),
         order.getOrderNumber(),
         order.getUser().getId(),
-        order.getStatus().getName(),
+        order.getStatus().name(),
         order.getSubtotal(),
         order.getDiscountTotal(),
         order.getTaxTotal(),
         order.getTotal(),
-        couponCode,
         order.getCreatedAt(),
         items);
   }

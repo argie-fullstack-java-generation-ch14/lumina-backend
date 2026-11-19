@@ -10,21 +10,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
   private final ProductRepository products;
-  private final CategoryService categoryService;
 
-  public ProductService(ProductRepository products, CategoryService categoryService) {
+  public ProductService(ProductRepository products) {
     this.products = products;
-    this.categoryService = categoryService;
   }
 
   // category: slug de la categoría (opcional). onlyAvailable: si es true, solo los disponibles.
   public List<Product> findAll(String category, boolean onlyAvailable) {
     boolean hasCategory = category != null && !category.isBlank();
     if (hasCategory && onlyAvailable) {
-      return products.findByCategorySlugAndAvailableTrue(category);
+      return products.findByCategoryIgnoreCaseAndAvailableTrue(category);
     }
     if (hasCategory) {
-      return products.findByCategorySlug(category);
+      return products.findByCategoryIgnoreCase(category);
     }
     if (onlyAvailable) {
       return products.findByAvailableTrue();
@@ -81,7 +79,7 @@ public class ProductService {
   private Product save(Product product, ProductRequest request) {
     product.setName(request.name().trim());
     product.setImageUrl(request.imageUrl());
-    product.setCategory(categoryService.findById(request.categoryId()));
+    product.setCategory(request.category().trim());
     product.setScent(request.scent());
     product.setWeightGrams(request.weightGrams());
     product.setColor(request.color());

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import com.lumina.usuario.AppUser;
-import com.lumina.cupon.Coupon;
 
 @Entity
 @Table(name = "user_order")
@@ -21,8 +20,8 @@ public class UserOrder {
   @JoinColumn(name = "app_user_id")
   private AppUser user;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "order_status_id")
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", length = 20)
   private OrderStatus status;
 
   @Column(name = "subtotal", precision = 12, scale = 2)
@@ -36,10 +35,6 @@ public class UserOrder {
 
   @Column(name = "total", precision = 12, scale = 2)
   private BigDecimal total;
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "coupon_id")
-  private Coupon coupon;
 
   private LocalDateTime createdAt;
 
@@ -80,9 +75,6 @@ public class UserOrder {
 
   public BigDecimal getTotal() { return total; }
   public void setTotal(BigDecimal total) { this.total = total; }
-
-  public Coupon getCoupon() { return coupon; }
-  public void setCoupon(Coupon coupon) { this.coupon = coupon; }
 
   public LocalDateTime getCreatedAt() { return createdAt; }
   public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

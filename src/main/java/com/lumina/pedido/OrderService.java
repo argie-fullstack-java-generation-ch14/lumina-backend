@@ -2,14 +2,10 @@ package com.lumina.pedido;
 
 import com.lumina.common.BadRequestException;
 import com.lumina.common.ResourceNotFoundException;
-import com.lumina.cupon.Coupon;
-import com.lumina.cupon.CouponRepository;
-import com.lumina.cupon.CouponService;
 import com.lumina.producto.Product;
 import com.lumina.producto.ProductRepository;
 import com.lumina.usuario.UserService;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -20,20 +16,14 @@ public class OrderService {
 
   private final UserOrderRepository orders;
   private final OrderItemRepository orderItems;
-  private final OrderStatusRepository statuses;
   private final ProductRepository products;
-  private final CouponRepository coupons;
-  private final CouponService couponService;
   private final UserService userService;
 
-  public OrderService(UserOrderRepository orders, OrderItemRepository orderItems, OrderStatusRepository statuses,
-      ProductRepository products, CouponRepository coupons, CouponService couponService, UserService userService) {
+  public OrderService(UserOrderRepository orders, OrderItemRepository orderItems,
+      ProductRepository products, UserService userService) {
     this.orders = orders;
     this.orderItems = orderItems;
-    this.statuses = statuses;
     this.products = products;
-    this.coupons = coupons;
-    this.couponService = couponService;
     this.userService = userService;
   }
 
@@ -42,7 +32,7 @@ public class OrderService {
   public OrderResponse create(OrderRequest request) {
     UserOrder order = new UserOrder();
     order.setUser(userService.getUser(request.userId()));
-    order.setStatus(getStatus("PENDING"));
+    order.setStatus(OrderStatus.PENDING);
 
     // 1) armo las líneas del pedido con el precio real de cada producto
     List<OrderItem> items = new ArrayList<>();
@@ -75,23 +65,13 @@ public class OrderService {
       items.add(item);
     }
 
-    // 2) cupón (opcional)
-    BigDecimal discount = BigDecimal.ZERO;
-    if (request.couponCode() != null && !request.couponCode().isBlank()) {
-      Coupon coupon = couponService.getValidCoupon(request.couponCode());
-      discount = calculateDiscount(coupon, subtotal);
-      coupon.setUsageCount((coupon.getUsageCount() == null ? 0 : coupon.getUsageCount()) + 1);
-      coupons.save(coupon);
-      order.setCoupon(coupon);
-    }
-
-    // 3) totales (por ahora sin impuestos)
+    // 2) totales (por ahora sin impuestos ni descuentos)
     order.setSubtotal(subtotal);
-    order.setDiscountTotal(discount);
+    order.setDiscountTotal(BigDecimal.ZERO);
     order.setTaxTotal(BigDecimal.ZERO);
-    order.setTotal(subtotal.subtract(discount));
+    order.setTotal(subtotal);
 
-    // 4) guardo el pedido, le pongo su número (LUM-000001) y guardo sus líneas
+    // 3) guardo el pedido, le pongo su número (LUM-000001) y guardo sus líneas
     order = orders.save(order);
     order.setOrderNumber(String.format("LUM-%06d", order.getId()));
     order = orders.save(order);
@@ -118,9 +98,9 @@ public class OrderService {
   @Transactional
   public OrderResponse updateStatus(Long id, OrderStatusRequest request) {
     UserOrder order = getOrder(id);
-    OrderStatus newStatus = getStatus(request.status().trim().toUpperCase());
-    boolean wasCancelled = "CANCELLED".equals(order.getStatus().getName());
-    boolean nowCancelled = "CANCELLED".equals(newStatus.getName());
+    OrderStatus newStatus = parseStatus(request.status());
+    boolean wasCancelled = OrderStatus.CANCELLED.equals(order.getStatus());
+    boolean nowCancelled = OrderStatus.CANCELLED.equals(newStatus);
 
     // si se cancela el pedido, las unidades vuelven al inventario
     if (nowCancelled && !wasCancelled) {
@@ -137,17 +117,6 @@ public class OrderService {
     return toResponse(orders.save(order));
   }
 
-  private BigDecimal calculateDiscount(Coupon coupon, BigDecimal subtotal) {
-    BigDecimal discount;
-    if ("PERCENTAGE".equals(coupon.getDiscountType())) {
-      discount = subtotal.multiply(coupon.getDiscountValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-    } else {
-      discount = coupon.getDiscountValue();
-    }
-    // el descuento nunca puede ser mayor que el subtotal
-    return discount.min(subtotal);
-  }
-
   private OrderResponse toResponse(UserOrder order) {
     return OrderResponse.from(order, orderItems.findByOrderId(order.getId()));
   }
@@ -157,8 +126,11 @@ public class OrderService {
         .orElseThrow(() -> new ResourceNotFoundException("No existe el pedido " + id + "."));
   }
 
-  private OrderStatus getStatus(String name) {
-    return statuses.findByName(name)
-        .orElseThrow(() -> new BadRequestException("El estado '" + name + "' no existe."));
+  private OrderStatus parseStatus(String name) {
+    try {
+      return OrderStatus.valueOf(name.trim().toUpperCase());
+    } catch (IllegalArgumentException | NullPointerException ex) {
+      throw new BadRequestException("El estado '" + name + "' no existe.");
+    }
   }
 }
