@@ -39,6 +39,18 @@ El refactor nace de la rama base `refactor/capa-integration`, creada desde `main
 6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
 7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
 
+## Reglas para evitar conflictos
+
+- [ ] No renombrar clases, métodos, records, enums ni constructores.
+- [ ] No cambiar firmas de métodos ni rutas REST.
+- [ ] No cambiar lógica de negocio.
+- [ ] No tocar `pom.xml`, `application.properties` ni `application-h2.properties`.
+- [ ] Usar `git mv` para conservar historial.
+- [ ] Actualizar primero el `package` y luego los imports.
+- [ ] El build completo se valida en la rama de integración, no en ramas parciales.
+- [ ] `main` no recibe merges hasta que la integración compile y pase el smoke test.
+
+---
 ## Objetivo
 
 Reorganizar el backend de Lumina desde paquetes por dominio (`usuario`, `producto`, `pedido`, `vela`, `common`) hacia una arquitectura por capas (layered architecture), sin cambiar:
@@ -285,17 +297,6 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - `GlobalExceptionHandler.java`: cambiar `package` a `com.lumina.exception`; importar `com.lumina.dto.response.ApiError`.
 - Entidades en `model`: quitar imports de clases que quedan en el mismo paquete (`model`).
 - Repositorios en `repository`: importar entidades desde `com.lumina.model`.
-
-## Reglas para evitar conflictos
-
-- [ ] No renombrar clases, métodos, records, enums ni constructores.
-- [ ] No cambiar firmas de métodos ni rutas REST.
-- [ ] No cambiar lógica de negocio.
-- [ ] No tocar `pom.xml`, `application.properties` ni `application-h2.properties`.
-- [ ] Usar `git mv` para conservar historial.
-- [ ] Actualizar primero el `package` y luego los imports.
-- [ ] El build completo se valida en la rama de integración, no en ramas parciales.
-- [ ] `main` no recibe merges hasta que la integración compile y pase el smoke test.
 
 ## Reparto de trabajo entre 4 personas
 
