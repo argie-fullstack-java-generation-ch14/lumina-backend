@@ -458,22 +458,6 @@ Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 - `vela`
 - `common`
 
-## Smoke test final (H2)
-
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=h2 -Dspring-boot.run.arguments=--server.port=18080
-```
-
-Probar en orden:
-1. `POST /api/registro`
-2. `POST /api/productos` con `category` como texto
-3. `POST /api/pedidos`
-4. `PUT /api/pedidos/{id}/estado` con `{"status":"CONFIRMED"}`
-5. `POST /api/velas-personalizadas`
-6. `GET /api/productos?categoria=navidad`
-
-Resultado esperado: mismos valores funcionales que antes de la migración.
-
 ## Rollback
 
 - Antes del merge: cerrar PR y borrar rama.

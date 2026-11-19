@@ -13,7 +13,7 @@ Este documento detalla, paso a paso y a profundidad, las actividades de cada uno
 
 ## Cómo usar este documento
 
-1. Lee primero `MIGRACION_MVC.md`, secciones **Contrato de paquetes** y **Contrato interno de nombres y firmas**.
+1. Lee primero `MIGRACION_CAPAS.md`, secciones **Contrato de paquetes** y **Contrato interno de nombres y firmas**.
 2. Ubica tu rol (A, B, C o D) y sigue los pasos en orden.
 3. No edites archivos de otro rol.
 4. No ejecutes el build completo en tu rama parcial: va a fallar hasta que los 4 roles estén unidos. Eso es esperado.
