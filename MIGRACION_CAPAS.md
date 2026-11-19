@@ -1,0 +1,373 @@
+# Migración a Arquitectura por Capas - Lumina Backend
+
+**Estado:** planificado, sin ejecutar.
+
+## Objetivo
+
+Reorganizar el backend de Lumina desde paquetes por dominio (`usuario`, `producto`, `pedido`, `vela`, `common`) hacia una arquitectura por capas (layered architecture), sin cambiar:
+
+- Endpoints REST (rutas y anotaciones Spring)
+- Nombres de clases, métodos, records y componentes
+- DTOs y esquema de base de datos
+- Lógica de negocio
+
+El código, las rutas y los mensajes siguen en español.
+
+## Capas objetivo
+
+| Capa | Paquete | Responsabilidad |
+|------|---------|-----------------|
+| Configuración | `com.lumina.config` | `DataInitializer`, `WebConfig` (PasswordEncoder bean) |
+| Controlador | `com.lumina.controller` | `@RestController`, endpoints REST |
+| DTO | `com.lumina.dto` | `dto/request/` y `dto/response/` |
+| CORS | `com.lumina.cors` | Configuración CORS (extraída de `WebConfig`) |
+| Modelo | `com.lumina.model` | Entidades JPA y enums |
+| Repositorio | `com.lumina.repository` | Interfaces `JpaRepository` |
+| Servicio | `com.lumina.service` | Lógica de negocio, `@Service`, `@Transactional` |
+| Excepción | `com.lumina.exception` | Excepciones personalizadas y `GlobalExceptionHandler` |
+
+**No se mueven:** `LuminaApiApplication.java` (queda en `com.lumina`).
+
+**Nota sobre `SlugUtil`:** no encaja en las 8 capas listadas. Se recomienda crear `com.lumina.util.SlugUtil` como capa de soporte, o dejarlo en `com.lumina.service` si se prefiere no añadir paquetes extra.
+
+## Estructura de directorios objetivo
+
+```text
+src/main/java/com/lumina
+├── LuminaApiApplication.java
+├── config/
+│   ├── DataInitializer.java
+│   └── WebConfig.java
+├── controller/
+│   ├── CustomCandleController.java
+│   ├── OrderController.java
+│   ├── ProductController.java
+│   └── UserController.java
+├── dto/
+│   ├── request/
+│   │   ├── CustomCandleRequest.java
+│   │   ├── LoginRequest.java
+│   │   ├── OrderItemRequest.java
+│   │   ├── OrderRequest.java
+│   │   ├── OrderStatusRequest.java
+│   │   ├── ProductRequest.java
+│   │   ├── RegisterRequest.java
+│   │   └── UpdateUserRequest.java
+│   └── response/
+│       ├── ApiError.java
+│       ├── OrderResponse.java
+│       └── UserResponse.java
+├── cors/
+│   └── CorsConfig.java
+├── exception/
+│   ├── BadRequestException.java
+│   ├── ConflictException.java
+│   ├── GlobalExceptionHandler.java
+│   ├── ResourceNotFoundException.java
+│   └── UnauthorizedException.java
+├── model/
+│   ├── AppUser.java
+│   ├── CustomCandle.java
+│   ├── OrderItem.java
+│   ├── OrderStatus.java
+│   ├── Product.java
+│   ├── Role.java
+│   └── UserOrder.java
+├── repository/
+│   ├── AppUserRepository.java
+│   ├── CustomCandleRepository.java
+│   ├── OrderItemRepository.java
+│   ├── ProductRepository.java
+│   ├── RoleRepository.java
+│   └── UserOrderRepository.java
+└── service/
+    ├── CustomCandleService.java
+    ├── OrderService.java
+    ├── ProductService.java
+    └── UserService.java
+```
+
+## Contrato de paquetes (fijo)
+
+| Elemento | Paquete destino |
+|----------|-----------------|
+| Entidades JPA + enum `OrderStatus` | `com.lumina.model` |
+| Repositorios Spring Data | `com.lumina.repository` |
+| Servicios | `com.lumina.service` |
+| Controladores REST | `com.lumina.controller` |
+| DTOs de entrada | `com.lumina.dto.request` |
+| DTOs de salida | `com.lumina.dto.response` |
+| Excepciones + `GlobalExceptionHandler` | `com.lumina.exception` |
+| Configuración CORS | `com.lumina.cors` |
+| Configuración general | `com.lumina.config` |
+| Clase principal | `com.lumina` |
+
+## Glosario breve
+
+- **FQCN** (nombre completo de la clase, incluyendo su paquete): por ejemplo, `com.lumina.model.AppUser`.
+- **DTO** (objeto de transferencia de datos): clase o record que transporta datos entre la API y las capas internas.
+- **Record** (clase de Java para transportar datos inmutables): en este proyecto se usa para los DTOs.
+- **Enum** (tipo de valores fijos): en este proyecto se usa para `OrderStatus`.
+- **JPA** (API de persistencia de Java): tecnología que mapea clases Java a tablas de base de datos.
+- **CRUD** (crear, leer, actualizar y borrar): operaciones básicas de persistencia.
+- **Optional** (contenedor que puede tener un valor o estar vacío): se usa cuando una búsqueda puede no encontrar nada.
+- **BigDecimal** (número decimal de precisión fija): se usa para precios y totales.
+- **LocalDateTime** (fecha y hora local): se usa para fechas de creación y actualización.
+- **ResponseEntity** (respuesta HTTP completa): incluye código de estado, cabeceras y cuerpo.
+- **Smoke test** (prueba rápida de funcionamiento): prueba manual breve para confirmar que los flujos principales funcionan.
+
+## Mapa FQCN actual → nuevo
+
+### Modelo
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.usuario.AppUser` | `com.lumina.model.AppUser` |
+| `com.lumina.usuario.Role` | `com.lumina.model.Role` |
+| `com.lumina.producto.Product` | `com.lumina.model.Product` |
+| `com.lumina.pedido.UserOrder` | `com.lumina.model.UserOrder` |
+| `com.lumina.pedido.OrderItem` | `com.lumina.model.OrderItem` |
+| `com.lumina.pedido.OrderStatus` | `com.lumina.model.OrderStatus` |
+| `com.lumina.vela.CustomCandle` | `com.lumina.model.CustomCandle` |
+
+### Repositorios
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.usuario.AppUserRepository` | `com.lumina.repository.AppUserRepository` |
+| `com.lumina.usuario.RoleRepository` | `com.lumina.repository.RoleRepository` |
+| `com.lumina.producto.ProductRepository` | `com.lumina.repository.ProductRepository` |
+| `com.lumina.pedido.UserOrderRepository` | `com.lumina.repository.UserOrderRepository` |
+| `com.lumina.pedido.OrderItemRepository` | `com.lumina.repository.OrderItemRepository` |
+| `com.lumina.vela.CustomCandleRepository` | `com.lumina.repository.CustomCandleRepository` |
+
+### Servicios
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.usuario.UserService` | `com.lumina.service.UserService` |
+| `com.lumina.producto.ProductService` | `com.lumina.service.ProductService` |
+| `com.lumina.pedido.OrderService` | `com.lumina.service.OrderService` |
+| `com.lumina.vela.CustomCandleService` | `com.lumina.service.CustomCandleService` |
+
+### Controladores
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.usuario.UserController` | `com.lumina.controller.UserController` |
+| `com.lumina.producto.ProductController` | `com.lumina.controller.ProductController` |
+| `com.lumina.pedido.OrderController` | `com.lumina.controller.OrderController` |
+| `com.lumina.vela.CustomCandleController` | `com.lumina.controller.CustomCandleController` |
+
+### DTOs de entrada
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.usuario.LoginRequest` | `com.lumina.dto.request.LoginRequest` |
+| `com.lumina.usuario.RegisterRequest` | `com.lumina.dto.request.RegisterRequest` |
+| `com.lumina.usuario.UpdateUserRequest` | `com.lumina.dto.request.UpdateUserRequest` |
+| `com.lumina.producto.ProductRequest` | `com.lumina.dto.request.ProductRequest` |
+| `com.lumina.pedido.OrderRequest` | `com.lumina.dto.request.OrderRequest` |
+| `com.lumina.pedido.OrderItemRequest` | `com.lumina.dto.request.OrderItemRequest` |
+| `com.lumina.pedido.OrderStatusRequest` | `com.lumina.dto.request.OrderStatusRequest` |
+| `com.lumina.vela.CustomCandleRequest` | `com.lumina.dto.request.CustomCandleRequest` |
+
+### DTOs de salida
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.usuario.UserResponse` | `com.lumina.dto.response.UserResponse` |
+| `com.lumina.pedido.OrderResponse` | `com.lumina.dto.response.OrderResponse` |
+| `com.lumina.common.ApiError` | `com.lumina.dto.response.ApiError` |
+
+### Excepciones y CORS
+| Actual | Nuevo |
+|--------|-------|
+| `com.lumina.common.BadRequestException` | `com.lumina.exception.BadRequestException` |
+| `com.lumina.common.ConflictException` | `com.lumina.exception.ConflictException` |
+| `com.lumina.common.ResourceNotFoundException` | `com.lumina.exception.ResourceNotFoundException` |
+| `com.lumina.common.UnauthorizedException` | `com.lumina.exception.UnauthorizedException` |
+| `com.lumina.common.GlobalExceptionHandler` | `com.lumina.exception.GlobalExceptionHandler` |
+| `com.lumina.config.WebConfig` (CORS) | `com.lumina.cors.CorsConfig` |
+
+### No se mueven
+- `com.lumina.LuminaApiApplication`
+- `com.lumina.config.WebConfig` (queda con `PasswordEncoder`; CORS se extrae a `cors`)
+- `com.lumina.config.DataInitializer` (solo actualiza imports)
+
+## Flujo de dependencias entre capas (regla de diseño)
+
+```
+controller  →  service  →  repository  →  model
+   ↑           ↑           ↑
+   │           │           └── exception
+   │           └── dto.request / dto.response / model / util
+   └── dto.request / dto.response / service
+```
+
+- **Controller** solo depende de `service` y `dto`.
+- **Service** depende de `repository`, `model`, `dto.request`, `dto.response`, `exception`, `util`.
+- **Repository** depende solo de `model`.
+- **Exception** depende de `dto.response` (`ApiError` en `GlobalExceptionHandler`).
+- **Cors** es independiente (configuración de Spring MVC).
+- **Config** es independiente (`DataInitializer` usa `model` + `repository`).
+
+**Prohibido:** dependencias hacia atrás (ej. service no llama a controller; repository no llama a service).
+
+## Pasos de migración (orden recomendado)
+
+La migración es **atómica para el compilador**: el build fallará hasta que todas las capas estén integradas. Se recomienda hacer la migración en una rama de integración y unir los cambios en este orden:
+
+1. **Capa modelo** (`model` + `util` opcional): mover 7 entidades/enum y `SlugUtil`; ajustar `package` y quitar imports intra-paquete que ya sobran.
+2. **Capa repositorio** (`repository`): mover 6 repositorios; cada uno importa su entidad de `com.lumina.model`.
+3. **Capa excepción** (`exception`): mover 5 excepciones + `GlobalExceptionHandler`; este último importa `com.lumina.dto.response.ApiError`.
+4. **Capa CORS** (`cors`): crear `CorsConfig` extrayendo la lógica CORS de `WebConfig`; `WebConfig` conserva solo `PasswordEncoder`.
+5. **Capa DTO** (`dto/request`, `dto/response`): mover 8 DTOs de entrada y 3 DTOs de salida + `ApiError`; ajustar imports a `model` cuando sea necesario.
+6. **Capa servicio** (`service`): mover 4 servicios; actualizar imports a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`.
+7. **Capa controlador** (`controller`): mover 4 controladores; actualizar imports a `service`, `dto.request`, `dto.response`, `model`.
+8. **Config** (`config`): actualizar `DataInitializer` para importar `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
+9. **Limpieza:** eliminar paquetes viejos (`usuario`, `producto`, `pedido`, `vela`, `common`) una vez vacíos.
+10. **Verificación:** build, búsqueda de paquetes viejos, smoke test.
+
+## Ajustes clave por archivo
+
+- `WebConfig.java`: separar CORS a `com.lumina.cors.CorsConfig`; `WebConfig` conserva `@Bean PasswordEncoder`.
+- `DataInitializer.java`: cambiar imports a `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
+- `GlobalExceptionHandler.java`: cambiar `package` a `com.lumina.exception`; importar `com.lumina.dto.response.ApiError`.
+- Entidades en `model`: quitar imports de clases que quedan en el mismo paquete (`model`).
+- Repositorios en `repository`: importar entidades desde `com.lumina.model`.
+
+## Reglas para evitar conflictos
+
+- [ ] No renombrar clases, métodos, records, enums ni constructores.
+- [ ] No cambiar firmas de métodos ni rutas REST.
+- [ ] No cambiar lógica de negocio.
+- [ ] No tocar `pom.xml`, `application.properties` ni `application-h2.properties`.
+- [ ] Usar `git mv` para conservar historial.
+- [ ] Actualizar primero el `package` y luego los imports.
+- [ ] El build completo se valida en la rama de integración, no en ramas parciales.
+- [ ] `main` no recibe merges hasta que la integración compile y pase el smoke test.
+
+## Reparto de trabajo entre 4 personas
+
+| Rol | Capas encargadas | Archivos a mover/editar | Paquetes destino | Integrante |
+|-----|------------------|-------------------------|------------------|------------|
+| **A** | Modelo + Utilidades | 7 entidades/enum + `SlugUtil` | `com.lumina.model`, `com.lumina.util` | Pedro |
+| **B** | Persistencia + Excepciones + CORS + Config | 6 repositorios + 5 excepciones + `GlobalExceptionHandler` + `CorsConfig` + ajustes en `WebConfig` y `DataInitializer` | `com.lumina.repository`, `com.lumina.exception`, `com.lumina.cors`, `com.lumina.config` | Nicole |
+| **C** | Servicios + DTOs de entrada | 4 servicios + 8 DTOs request | `com.lumina.service`, `com.lumina.dto.request` | Argie |
+| **D** | Controladores + DTOs de salida | 4 controladores + 3 DTOs response + `ApiError` | `com.lumina.controller`, `com.lumina.dto.response` | Naya |
+| **Integración** | Build, smoke test, merge a `main`, revisión de `README.md` vs estructura final | Unir PRs A→B→C→D, ejecutar build, ejecutar smoke test, validar documentación, merge a `main`, limpiar paquetes viejos | `com.lumina` (raíz) + documentación | Argie |
+
+### Estrategia de ramas y Git
+
+1. El responsable de integración crea la rama base desde `main`:
+
+   ```bash
+   git switch main
+   git pull
+   git switch -c refactor/capa-integration
+   git push -u origin refactor/capa-integration
+   ```
+
+2. Cada integrante crea su rama desde `refactor/capa-integration`:
+
+   ```bash
+   git switch refactor/capa-integration
+   git pull
+   git switch -c refactor/capa-modelo   # ejemplo para el Rol A
+   ```
+
+3. Nombres sugeridos de rama:
+
+   | Rol | Rama |
+   |-----|------|
+   | A | `refactor/capa-modelo` |
+   | B | `refactor/capa-persistencia` |
+   | C | `refactor/capa-servicios` |
+   | D | `refactor/capa-api` |
+
+4. Cada integrante trabaja solo en los archivos de su rol y abre un PR hacia `refactor/capa-integration`.
+5. Argie (Rol C) une los 4 PR en este orden recomendado: **A, B, C, D**.
+6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
+7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
+
+### Reglas para evitar conflictos y errores de compilación
+
+- Cada integrante edita únicamente los archivos de su rol.
+- No se renombran clases ni métodos.
+- No se cambia lógica de negocio.
+- No se hace reemplazo global de paquetes; cada clase tiene un destino distinto.
+- Se usa `git mv` para conservar historial.
+- Se actualiza primero el `package` y luego los imports.
+- Cada rol revisa sus imports contra el contrato de paquetes antes del PR.
+- El build completo se hace en la rama de integración, no en ramas parciales.
+- `main` no recibe merges hasta que la integración esté verde.
+
+### Checklist rápido por rol
+
+## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-a)
+- [ ] 7 entidades en `com.lumina.model` con `package` actualizado.
+- [ ] `SlugUtil` en `com.lumina.util`.
+- [ ] Quitar imports de clases que ahora están en el mismo paquete `model`.
+- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`.
+
+## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-b)
+- [ ] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`.
+- [ ] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`.
+- [ ] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`.
+- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
+- [ ] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
+- [ ] Sin imports de `com.lumina.common` en archivos de este rol.
+
+## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-c)
+- [ ] 4 servicios en `com.lumina.service`.
+- [ ] 8 DTOs request en `com.lumina.dto.request`.
+- [ ] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`.
+- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`.
+
+## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-d)
+- [ ] 4 controladores en `com.lumina.controller`.
+- [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
+- [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
+
+**Argie (Integración y validación de documentación — además del Rol C)**
+- [ ] Unir PRs A→B→C→D en `refactor/capa-integration`.
+- [ ] Ejecutar build completo (`mvn -q -DskipTests package`).
+- [ ] Verificar que no queden paquetes viejos (`grep` de `usuario`, `producto`, `pedido`, `vela`, `common`).
+- [ ] Verificar estructura de directorios esperada.
+- [ ] Ejecutar smoke test final (H2).
+- [ ] Validar que `README.md` coincida con la estructura final por capas.
+- [ ] Mergear `refactor/capa-integration` a `main`.
+- [ ] Eliminar paquetes viejos una vez vacíos.
+
+## Verificación final de integración
+
+```bash
+# Build
+mvn -q -DskipTests package
+
+# No quedar paquetes viejos
+grep -REn "package com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
+grep -REn "import com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
+
+# Estructura esperada
+find src/main/java/com/lumina -maxdepth 3 -type d | sort
+```
+
+Debe mostrar: `config`, `controller`, `dto`, `dto/request`, `dto/response`, `cors`, `exception`, `model`, `repository`, `service` (y opcionalmente `util`).
+
+## Smoke test final (H2)
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=h2 -Dspring-boot.run.arguments=--server.port=18080
+```
+
+Probar en orden:
+1. `POST /api/registro`
+2. `POST /api/productos` con `category` como texto
+3. `POST /api/pedidos`
+4. `PUT /api/pedidos/{id}/estado` con `{"status":"CONFIRMED"}`
+5. `POST /api/velas-personalizadas`
+6. `GET /api/productos?categoria=navidad`
+
+Resultado esperado: mismos valores funcionales que antes de la migración.
+
+## Rollback
+
+- Antes del merge: cerrar PR y borrar rama.
+- En integración: `git reset --hard <commit-base>`.
+- Después del merge a `main`: `git revert <hash>` (no usar `reset --hard` sobre `main` compartido).
