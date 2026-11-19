@@ -393,7 +393,7 @@ Antes de empezar, cada integrante debe leer la sección **Contrato interno de no
 
 ---
 
-## Rol A: modelo y utilidades
+## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-a-modelo-y-utilidades--dificultad-2-de-5)
 
 ### Archivos
 
@@ -444,7 +444,7 @@ git mv src/main/java/com/lumina/producto/SlugUtil.java src/main/java/com/lumina/
 
 ---
 
-## Rol B: persistencia, excepciones y configuración
+## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-b-persistencia-excepciones-y-configuración--dificultad-3-de-5)
 
 ### Archivos
 
@@ -511,7 +511,7 @@ git mv src/main/java/com/lumina/common/GlobalExceptionHandler.java src/main/java
 
 ---
 
-## Rol C: servicios y DTOs de entrada
+## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-c-servicios-y-dtos-de-entrada--dificultad-4-de-5)
 
 ### Archivos
 
@@ -616,7 +616,7 @@ Notas:
 
 ---
 
-## Rol D: controladores, DTOs de salida, documentación e integración
+## Rol D: controladores, DTOs de salida, documentación e integración · [Paso a paso detallado](MIGRACION_MVC_PASO_A_PASO.md#rol-d-controladores-dtos-de-salida-documentación-e-integración--dificultad-3-de-5)
 
 ### Archivos
 
