@@ -63,6 +63,54 @@ controller  →  service  →  repository  →  model
 
 ---
 
+## Endpoints REST (contrato fijo)
+
+La migración **no cambia rutas ni anotaciones Spring**. Los endpoints viven en los 4 controladores y el Rol D solo los mueve a `com.lumina.controller` conservando `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@PutMapping` y `@DeleteMapping` tal cual. CORS aplica a `/api/**` (`CorsConfig`).
+
+### Usuarios — `UserController` (`@RequestMapping("/api")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/registro` | Crea cuenta con rol `CUSTOMER`. Responde `201`. Body: `RegisterRequest`. |
+| POST | `/api/login` | Valida credenciales con `PasswordEncoder`. Body: `LoginRequest`. |
+| GET | `/api/usuarios` | Lista `UserResponse`. |
+| GET | `/api/usuarios/{id}` | Un `UserResponse` por id. |
+| PUT | `/api/usuarios/{id}` | Actualiza nombre y teléfono. Body: `UpdateUserRequest`. |
+| DELETE | `/api/usuarios/{id}` | Responde `204`. |
+
+### Productos — `ProductController` (`@RequestMapping("/api/productos")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/productos` | Filtros opcionales: `?categoria=navidad&disponibles=true`. |
+| GET | `/api/productos/{id}` | Un producto por id. |
+| GET | `/api/productos/slug/{slug}` | Un producto por slug. |
+| POST | `/api/productos` | Responde `201`. Body: `ProductRequest` con `category` como texto. |
+| PUT | `/api/productos/{id}` | Actualiza producto. Body: `ProductRequest`. |
+| DELETE | `/api/productos/{id}` | Responde `204`. |
+
+### Pedidos — `OrderController` (`@RequestMapping("/api/pedidos")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/pedidos` | Responde `201`. Body: `OrderRequest`. Calcula totales y descuenta stock. |
+| GET | `/api/pedidos` | Filtro opcional: `?usuarioId=2`. |
+| GET | `/api/pedidos/{id}` | Un `OrderResponse` por id. |
+| PUT | `/api/pedidos/{id}/estado` | Body: `OrderStatusRequest`, por ejemplo `{"status":"CONFIRMED"}`. |
+
+### Velas personalizadas — `CustomCandleController` (`@RequestMapping("/api/velas-personalizadas")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/velas-personalizadas` | Responde `201`. Body: `CustomCandleRequest`. |
+| GET | `/api/velas-personalizadas` | Requiere `?usuarioId=`. |
+| GET | `/api/velas-personalizadas/{id}` | Una vela personalizada por id. |
+| DELETE | `/api/velas-personalizadas/{id}` | Responde `204`. |
+
+**Total: 20 endpoints.** Esta lista debe coincidir con `README.md` (sección Endpoints) después de la migración; si algo difiere, es un error de integración.
+
+---
+
 ## Orden recomendado de integración
 
 Los PR se unen en este orden: **A → B → C → D → E**. Argie (Rol C) es responsable de unir los PR, validar la documentación, ejecutar el build, el smoke test y hacer el merge a `main`. El build completo se valida en la rama de integración, no en ramas parciales. `main` no recibe merges hasta que la integración compile y pase el smoke test.
