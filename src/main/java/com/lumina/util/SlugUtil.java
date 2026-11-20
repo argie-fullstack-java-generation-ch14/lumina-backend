@@ -1,4 +1,4 @@
-package com.lumina.producto;
+package com.lumina.util;
 
 import java.text.Normalizer;
 

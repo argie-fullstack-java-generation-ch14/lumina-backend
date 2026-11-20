@@ -1,4 +1,4 @@
-package com.lumina.pedido;
+package com.lumina.model;
 
 public enum OrderStatus {
   PENDING,
