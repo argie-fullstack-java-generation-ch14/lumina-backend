@@ -1,9 +1,8 @@
-package com.lumina.pedido;
+package com.lumina.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import com.lumina.usuario.AppUser;
 
 @Entity
 @Table(name = "user_order")

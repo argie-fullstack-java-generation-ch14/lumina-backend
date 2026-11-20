@@ -1,4 +1,4 @@
-package com.lumina.producto;
+package com.lumina.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;

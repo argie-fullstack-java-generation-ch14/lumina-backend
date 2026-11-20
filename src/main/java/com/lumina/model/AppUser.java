@@ -1,4 +1,4 @@
-package com.lumina.usuario;
+package com.lumina.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

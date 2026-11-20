@@ -1,9 +1,7 @@
-package com.lumina.pedido;
+package com.lumina.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import com.lumina.producto.Product;
-import com.lumina.vela.CustomCandle;
 
 @Entity
 @Table(name = "order_item")
