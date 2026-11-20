@@ -1,5 +1,6 @@
-package com.lumina.common;
+package com.lumina.exception;
 
+import com.lumina.dto.response.ApiError;
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

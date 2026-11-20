@@ -1,4 +1,6 @@
-package com.lumina.producto;
+package com.lumina.repository;
+
+import com.lumina.model.Product;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.lumina.common;
+package com.lumina.exception;
 
 // Choca con algo que ya existe (409)
 public class ConflictException extends RuntimeException {

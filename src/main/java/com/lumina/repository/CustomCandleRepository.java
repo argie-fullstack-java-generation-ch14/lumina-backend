@@ -1,4 +1,6 @@
-package com.lumina.vela;
+package com.lumina.repository;
+
+import com.lumina.model.CustomCandle;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;

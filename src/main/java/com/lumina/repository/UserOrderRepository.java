@@ -1,4 +1,6 @@
-package com.lumina.pedido;
+package com.lumina.repository;
+
+import com.lumina.model.UserOrder;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
