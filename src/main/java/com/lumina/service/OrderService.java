@@ -14,13 +14,20 @@ import com.lumina.repository.OrderItemRepository;
 import com.lumina.repository.ProductRepository;
 import com.lumina.repository.UserOrderRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
+
+  private static final BigDecimal IVA_TASA = new BigDecimal("0.19");
+  private static final Map<String, BigDecimal> CUPONES = Map.of(
+      "LUMINA26", new BigDecimal("0.10"));
 
   private final UserOrderRepository orders;
   private final OrderItemRepository orderItems;
@@ -41,6 +48,9 @@ public class OrderService {
     UserOrder order = new UserOrder();
     order.setUser(userService.getUser(request.userId()));
     order.setStatus(OrderStatus.PENDING);
+
+    // valido el cupón antes de tocar el inventario
+    BigDecimal couponRate = tasaCupon(request.couponCode());
 
     // 1) armo las líneas del pedido con el precio real de cada producto
     List<OrderItem> items = new ArrayList<>();
@@ -73,11 +83,15 @@ public class OrderService {
       items.add(item);
     }
 
-    // 2) totales (por ahora sin impuestos ni descuentos)
+    // 2) totales: descuento por cupón, IVA sobre la base neta y total
+    BigDecimal discount = subtotal.multiply(couponRate).setScale(0, RoundingMode.HALF_UP);
+    BigDecimal taxableBase = subtotal.subtract(discount);
+    BigDecimal tax = taxableBase.multiply(IVA_TASA).setScale(0, RoundingMode.HALF_UP);
+
     order.setSubtotal(subtotal);
-    order.setDiscountTotal(BigDecimal.ZERO);
-    order.setTaxTotal(BigDecimal.ZERO);
-    order.setTotal(subtotal);
+    order.setDiscountTotal(discount);
+    order.setTaxTotal(tax);
+    order.setTotal(taxableBase.add(tax));
 
     // 3) guardo el pedido, le pongo su número (LUM-000001) y guardo sus líneas
     order = orders.save(order);
@@ -132,6 +146,17 @@ public class OrderService {
   private UserOrder getOrder(Long id) {
     return orders.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("No existe el pedido " + id + "."));
+  }
+
+  private BigDecimal tasaCupon(String couponCode) {
+    if (couponCode == null || couponCode.isBlank()) {
+      return BigDecimal.ZERO;
+    }
+    BigDecimal rate = CUPONES.get(couponCode.trim().toUpperCase(Locale.ROOT));
+    if (rate == null) {
+      throw new BadRequestException("El cupón '" + couponCode.trim() + "' no es válido.");
+    }
+    return rate;
   }
 
   private OrderStatus parseStatus(String name) {

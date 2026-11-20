@@ -13,5 +13,7 @@ public record OrderRequest(
 
     @NotEmpty(message = "El pedido debe tener al menos un producto.")
     @Valid
-    List<OrderItemRequest> items) {
+    List<OrderItemRequest> items,
+
+    String couponCode) {
 }
