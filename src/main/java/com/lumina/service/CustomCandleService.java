@@ -1,7 +1,9 @@
-package com.lumina.vela;
+package com.lumina.service;
 
-import com.lumina.common.ResourceNotFoundException;
-import com.lumina.usuario.UserService;
+import com.lumina.dto.request.CustomCandleRequest;
+import com.lumina.exception.ResourceNotFoundException;
+import com.lumina.model.CustomCandle;
+import com.lumina.repository.CustomCandleRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

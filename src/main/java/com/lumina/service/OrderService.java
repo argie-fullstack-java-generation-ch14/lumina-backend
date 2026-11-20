@@ -1,10 +1,18 @@
-package com.lumina.pedido;
+package com.lumina.service;
 
-import com.lumina.common.BadRequestException;
-import com.lumina.common.ResourceNotFoundException;
-import com.lumina.producto.Product;
-import com.lumina.producto.ProductRepository;
-import com.lumina.usuario.UserService;
+import com.lumina.dto.request.OrderItemRequest;
+import com.lumina.dto.request.OrderRequest;
+import com.lumina.dto.request.OrderStatusRequest;
+import com.lumina.dto.response.OrderResponse;
+import com.lumina.exception.BadRequestException;
+import com.lumina.exception.ResourceNotFoundException;
+import com.lumina.model.OrderItem;
+import com.lumina.model.OrderStatus;
+import com.lumina.model.Product;
+import com.lumina.model.UserOrder;
+import com.lumina.repository.OrderItemRepository;
+import com.lumina.repository.ProductRepository;
+import com.lumina.repository.UserOrderRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
