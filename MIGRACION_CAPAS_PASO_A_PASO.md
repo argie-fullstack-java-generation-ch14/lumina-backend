@@ -10,6 +10,7 @@ Este documento detalla, paso a paso y a profundidad, las actividades de cada uno
 | [Rol B](#rol-b) | Persistencia, excepciones y configuración | 3 de 5 | [Paso a paso](#rol-b) | Nicole |
 | [Rol C](#rol-c) | Servicios y DTOs de entrada | 4 de 5 | [Paso a paso](#rol-c) | Argie |
 | [Rol D](#rol-d) | Controladores y DTOs de salida | 3 de 5 | [Paso a paso](#rol-d) | Naya |
+| [Rol E](#rol-e) | Seguridad y autenticación | 3 de 5 | [Paso a paso](#rol-e) | Por definir |
 
 ## Cómo usar este documento
 
@@ -64,7 +65,7 @@ controller  →  service  →  repository  →  model
 
 ## Orden recomendado de integración
 
-Los PR se unen en este orden: **A → B → C → D**. Argie (Rol C) es responsable de unir los PR, validar la documentación, ejecutar el build, el smoke test y hacer el merge a `main`. El build completo se valida en la rama de integración, no en ramas parciales. `main` no recibe merges hasta que la integración compile y pase el smoke test.
+Los PR se unen en este orden: **A → B → C → D → E**. Argie (Rol C) es responsable de unir los PR, validar la documentación, ejecutar el build, el smoke test y hacer el merge a `main`. El build completo se valida en la rama de integración, no en ramas parciales. `main` no recibe merges hasta que la integración compile y pase el smoke test.
 
 ---
 
@@ -555,17 +556,96 @@ git push origin refactor/capa-integration
 
 ---
 
+<a id="rol-e"></a>
+
+## Rol E: seguridad y autenticación — Dificultad 3 de 5 — Por definir
+
+**Objetivo:** migrar los archivos relacionados con autenticación y seguridad a sus paquetes finales en la arquitectura por capas.
+
+**Por qué es 3 de 5:** son archivos distribuidos en varios paquetes (config, usuario, common) que deben coordinarse; requiere entender cómo se usa `PasswordEncoder` entre `UserService` y `WebConfig`.
+
+### Antes de empezar
+
+```bash
+git switch refactor/capa-integration
+git pull
+git switch -c refactor/capa-seguridad
+git push -u origin refactor/capa-seguridad
+```
+
+### Mapa de archivos (actual → nuevo)
+
+| Archivo actual | Paquete destino | Acción |
+|----------------|-----------------|--------|
+| `com.lumina.config.WebConfig` | `com.lumina.config` | Conservar solo `@Bean PasswordEncoder` |
+| `com.lumina.usuario.UserService` | `com.lumina.service` | Ya movido por Rol C; verificar `login()` |
+| `com.lumina.usuario.UserController` | `com.lumina.controller` | Ya movido por Rol D; verificar `/api/login` |
+| `com.lumina.common.UnauthorizedException` | `com.lumina.exception` | Ya movido por Rol B |
+| `com.lumina.config.DataInitializer` | `com.lumina.config` | Ya movido por Rol B; verificar roles iniciales |
+
+### Paso 1: Verificar `WebConfig` (PasswordEncoder)
+
+Abrir `src/main/java/com/lumina/config/WebConfig.java` y confirmar que solo conserva el `@Bean PasswordEncoder` (CORS ya se extrajo a `CorsConfig` por Rol B).
+
+### Paso 2: Verificar `UserService.login()`
+
+Abrir `src/main/java/com/lumina/service/UserService.java` y confirmar que:
+- Importa `com.lumina.exception.UnauthorizedException`
+- Usa `passwordEncoder.matches()` para validar credenciales
+
+### Paso 3: Verificar `UserController.login()`
+
+Abrir `src/main/java/com/lumina/controller/UserController.java` y confirmar que:
+- Importa `com.lumina.service.UserService`
+- El endpoint `POST /api/login` funciona correctamente
+
+### Paso 4: Verificar `UnauthorizedException`
+
+Confirmar que está en `com.lumina.exception` (movido por Rol B) y que `GlobalExceptionHandler` la mapea a HTTP 401.
+
+### Paso 5: Verificar `DataInitializer`
+
+Confirmar que crea los roles iniciales (`ADMIN`, `CUSTOMER`, `STAFF`) y importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
+
+### Paso 6: Checklist del Rol E
+
+- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`
+- [ ] `UserService.login()` importa `com.lumina.exception.UnauthorizedException`
+- [ ] `UserController.login()` importa `com.lumina.service.UserService`
+- [ ] `UnauthorizedException` en `com.lumina.exception`
+- [ ] `DataInitializer` crea roles iniciales correctamente
+- [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol
+
+### Paso 7: Abrir el PR
+
+```bash
+git add .
+git commit -m "feat(rol-e): migrar archivos de seguridad y autenticación a capas"
+git push origin refactor/capa-seguridad
+```
+
+### Paso 8: Hacer merge de la PR a la rama base
+
+```bash
+git switch refactor/capa-integration
+git pull
+git merge --no-ff refactor/capa-seguridad
+git push origin refactor/capa-integration
+```
+
+---
+
 ## Integración y validación (Argie)
 
 **Responsable:** Argie (además del Rol C — Servicios y DTOs de entrada)  
-**Cuándo:** Después de que los 4 PR (A, B, C, D) estén aprobados y mergeados en la rama base `refactor/capa-integration`.
+**Cuándo:** Después de que los 5 PR (A, B, C, D, E) estén aprobados y mergeados en la rama base `refactor/capa-integration`.
 
 > **Importante:** Cada integrante abre su PR hacia la rama base `refactor/capa-integration`, **no hacia `main`**. La integración y el merge a `main` son tareas exclusivas de esta etapa final, a cargo de Argie.
 
-### Paso 1: Unir los PR en orden A → B → C → D
+### Paso 1: Unir los PR en orden A → B → C → D → E
 
-1. Verificar que los PR de los roles A, B, C y D estén aprobados.
-2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D**.
+1. Verificar que los PR de los roles A, B, C, D y E estén aprobados.
+2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D, luego E**.
 3. Hacer pull de la rama de integración:
 
 ```bash
