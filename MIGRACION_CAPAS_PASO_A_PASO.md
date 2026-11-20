@@ -1,6 +1,6 @@
 # Migración a Arquitectura por Capas - Paso a Paso Detallado por Rol
 
-Este documento detalla, paso a paso y a profundidad, las actividades de cada uno de los 4 roles definidos en `MIGRACION_CAPAS.md` para la migración del backend de Lumina hacia una arquitectura por capas (layered architecture).
+Este documento detalla, paso a paso y a profundidad, las actividades de cada uno de los roles definidos en `MIGRACION_CAPAS.md` para la migración del backend de Lumina hacia una arquitectura por capas (layered architecture).
 
 ## Tabla de roles
 

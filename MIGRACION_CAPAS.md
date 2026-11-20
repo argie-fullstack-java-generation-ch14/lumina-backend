@@ -4,7 +4,7 @@
 
 ## Rama de trabajo
 
-El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con los 5 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
+El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con todos los roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
 
 ## Estrategia de ramas y Git
 
@@ -36,8 +36,8 @@ El refactor nace de la rama base `refactor/capa-integration`, creada desde `main
    | E | `refactor/capa-seguridad` |
 
 4. Cada integrante trabaja solo en los archivos de su rol y abre un PR hacia `refactor/capa-integration`.
-5. Argie (Rol C) une los 5 PR en este orden recomendado: **A, B, C, D, E**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
-6. El build y el smoke test se ejecutan al final, con los 5 roles integrados.
+5. Argie (Rol C) une los PR en este orden recomendado: **A, B, C, D, E**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
+6. El build y el smoke test se ejecutan al final, con todos los roles integrados.
 7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
 
 ## Reglas para evitar conflictos
@@ -299,7 +299,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - Entidades en `model`: quitar imports de clases que quedan en el mismo paquete (`model`).
 - Repositorios en `repository`: importar entidades desde `com.lumina.model`.
 
-## Reparto de trabajo entre 5 personas
+## Reparto de trabajo entre 4 personas
 
 | Rol | Capas encargadas | Archivos a mover/editar | Paquetes destino | Integrante |
 |-----|------------------|-------------------------|------------------|------------|
@@ -307,7 +307,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 | **B** | Persistencia + Excepciones + CORS + Config | 6 repositorios + 5 excepciones + `GlobalExceptionHandler` + `CorsConfig` + ajustes en `WebConfig` y `DataInitializer` | `com.lumina.repository`, `com.lumina.exception`, `com.lumina.cors`, `com.lumina.config` | Nicole |
 | **C** | Servicios + DTOs de entrada | 4 servicios + 8 DTOs request | `com.lumina.service`, `com.lumina.dto.request` | Argie |
 | **D** | Controladores + DTOs de salida | 4 controladores + 3 DTOs response + `ApiError` | `com.lumina.controller`, `com.lumina.dto.response` | Naya |
-| **E** | Seguridad y Autenticación | `WebConfig` (PasswordEncoder), `UserService.login()`, `UserController.login()`, `UnauthorizedException`, `DataInitializer` (roles) | `com.lumina.config`, `com.lumina.service`, `com.lumina.controller`, `com.lumina.exception` | Por definir |
+| **E** | Seguridad y Autenticación | `WebConfig` (PasswordEncoder), `UserService.login()`, `UserController.login()`, `UnauthorizedException`, `DataInitializer` (roles) | `com.lumina.config`, `com.lumina.service`, `com.lumina.controller`, `com.lumina.exception` | Por definir (uno de los 4) |
 | **Integración** | Build, smoke test, merge a `main`, revisión de `README.md` vs estructura final | Unir PRs A→B→C→D, ejecutar build, ejecutar smoke test, validar documentación, merge a `main`, limpiar paquetes viejos | `com.lumina` (raíz) + documentación | Argie |
 
 ### Reglas para evitar conflictos y errores de compilación
