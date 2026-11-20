@@ -4,7 +4,7 @@
 
 ## Rama de trabajo
 
-El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con los 4 roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
+El refactor nace de la rama base `refactor/capa-integration`, creada desde `main`. Cada integrante crea su rama hija a partir de `refactor/capa-integration`, trabaja solo en sus archivos y abre un Pull Request hacia esa misma rama base. Si no hay conflictos, se hace merge directamente a `refactor/capa-integration`; si hay conflictos, se resuelven y luego se hace el merge. Solo al final, con todos los roles integrados y el build verde, `refactor/capa-integration` se fusiona a `main`.
 
 ## Estrategia de ramas y Git
 
@@ -33,10 +33,11 @@ El refactor nace de la rama base `refactor/capa-integration`, creada desde `main
    | B | `refactor/capa-persistencia` |
    | C | `refactor/capa-servicios` |
    | D | `refactor/capa-api` |
+   | E | `refactor/capa-seguridad` |
 
 4. Cada integrante trabaja solo en los archivos de su rol y abre un PR hacia `refactor/capa-integration`.
-5. Argie (Rol C) une los 4 PR en este orden recomendado: **A, B, C, D**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
-6. El build y el smoke test se ejecutan al final, con los 4 roles integrados.
+5. Argie (Rol C) une los PR en este orden recomendado: **A, B, C, D, E**. Si el PR no tiene conflictos, se hace merge directamente; si tiene conflictos, se resuelven y luego se hace el merge. No es necesaria la aprobación formal del PR por temas de tiempo.
+6. El build y el smoke test se ejecutan al final, con todos los roles integrados.
 7. Si todo pasa, `refactor/capa-integration` se fusiona a `main`.
 
 ## Reglas para evitar conflictos
@@ -306,6 +307,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 | **B** | Persistencia + Excepciones + CORS + Config | 6 repositorios + 5 excepciones + `GlobalExceptionHandler` + `CorsConfig` + ajustes en `WebConfig` y `DataInitializer` | `com.lumina.repository`, `com.lumina.exception`, `com.lumina.cors`, `com.lumina.config` | Nicole |
 | **C** | Servicios + DTOs de entrada | 4 servicios + 8 DTOs request | `com.lumina.service`, `com.lumina.dto.request` | Argie |
 | **D** | Controladores + DTOs de salida | 4 controladores + 3 DTOs response + `ApiError` | `com.lumina.controller`, `com.lumina.dto.response` | Naya |
+| **E** | Seguridad y Autenticación | `WebConfig` (PasswordEncoder), `UserService.login()`, `UserController.login()`, `UnauthorizedException`, `DataInitializer` (roles) | `com.lumina.config`, `com.lumina.service`, `com.lumina.controller`, `com.lumina.exception` | Por definir (uno de los 4) |
 | **Integración** | Build, smoke test, merge a `main`, revisión de `README.md` vs estructura final | Unir PRs A→B→C→D, ejecutar build, ejecutar smoke test, validar documentación, merge a `main`, limpiar paquetes viejos | `com.lumina` (raíz) + documentación | Argie |
 
 ### Reglas para evitar conflictos y errores de compilación
@@ -347,6 +349,14 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
 - [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
 
+## Rol E: seguridad y autenticación · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-e)
+- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`
+- [ ] `UserService.login()` importa `com.lumina.exception.UnauthorizedException`
+- [ ] `UserController.login()` importa `com.lumina.service.UserService`
+- [ ] `UnauthorizedException` en `com.lumina.exception`
+- [ ] `DataInitializer` crea roles iniciales (`ADMIN`, `CUSTOMER`, `STAFF`)
+- [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol
+
 **Argie (Integración y validación de documentación — además del Rol C)**
 - [ ] Unir PRs A→B→C→D en `refactor/capa-integration`.
 - [ ] Ejecutar build completo (`mvn -q -DskipTests package`).
@@ -360,14 +370,14 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 ## Integración y validación (Argie)
 
 **Responsable:** Argie (además del Rol C — Servicios y DTOs de entrada)  
-**Cuándo:** Después de que los 4 PR (A, B, C, D) estén aprobados y mergeados en la rama base `refactor/capa-integration`.
+**Cuándo:** Después de que los 5 PR (A, B, C, D, E) estén aprobados y mergeados en la rama base `refactor/capa-integration`.
 
 > **Importante:** Cada integrante abre su PR hacia la rama base `refactor/capa-integration`, **no hacia `main`**. La integración y el merge a `main` son tareas exclusivas de esta etapa final, a cargo de Argie.
 
-### Paso 1: Unir los PR en orden A → B → C → D
+### Paso 1: Unir los PR en orden A → B → C → D → E
 
-1. Verificar que los PR de los roles A, B, C y D estén aprobados.
-2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D**.
+1. Verificar que los PR de los roles A, B, C, D y E estén aprobados.
+2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D, luego E**.
 3. Hacer pull de la rama de integración:
 
 ```bash
