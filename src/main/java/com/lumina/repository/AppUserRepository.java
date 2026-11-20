@@ -1,4 +1,6 @@
-package com.lumina.usuario;
+package com.lumina.repository;
+
+import com.lumina.model.AppUser;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;

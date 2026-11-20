@@ -1,4 +1,4 @@
-package com.lumina.common;
+package com.lumina.exception;
 
 // Credenciales incorrectas (401)
 public class UnauthorizedException extends RuntimeException {

@@ -1,7 +1,7 @@
 package com.lumina.config;
 
-import com.lumina.usuario.Role;
-import com.lumina.usuario.RoleRepository;
+import com.lumina.model.Role;
+import com.lumina.repository.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
