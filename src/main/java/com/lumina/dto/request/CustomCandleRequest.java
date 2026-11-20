@@ -1,4 +1,4 @@
-package com.lumina.vela;
+package com.lumina.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

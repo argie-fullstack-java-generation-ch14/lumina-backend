@@ -1,4 +1,4 @@
-package com.lumina.usuario;
+package com.lumina.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 

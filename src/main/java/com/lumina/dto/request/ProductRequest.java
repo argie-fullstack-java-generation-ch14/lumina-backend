@@ -1,4 +1,4 @@
-package com.lumina.producto;
+package com.lumina.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;

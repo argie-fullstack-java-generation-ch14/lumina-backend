@@ -1,4 +1,4 @@
-package com.lumina.pedido;
+package com.lumina.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

@@ -324,25 +324,25 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 
 ### Checklist rápido por rol
 
-## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-a)
-- [ ] 7 entidades en `com.lumina.model` con `package` actualizado.
-- [ ] `SlugUtil` en `com.lumina.util`.
-- [ ] Quitar imports de clases que ahora están en el mismo paquete `model`.
-- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`.
+## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-a) ✅
+- [x] 7 entidades en `com.lumina.model` con `package` actualizado. ✅
+- [x] `SlugUtil` en `com.lumina.util`. ✅
+- [x] Quitar imports de clases que ahora están en el mismo paquete `model`. ✅
+- [x] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`. ✅
 
-## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-b)
-- [ ] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`.
-- [ ] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`.
-- [ ] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`.
-- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
-- [ ] Sin imports de `com.lumina.common` en archivos de este rol.
+## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-b) ✅
+- [x] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`. ✅
+- [x] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`. ✅
+- [x] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`. ✅
+- [x] `WebConfig` conserva solo `@Bean PasswordEncoder`. ✅
+- [x] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`. ✅
+- [x] Sin imports de `com.lumina.common` en archivos de este rol. ✅
 
-## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-c)
-- [ ] 4 servicios en `com.lumina.service`.
-- [ ] 8 DTOs request en `com.lumina.dto.request`.
-- [ ] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`.
-- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`.
+## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-c) ✅
+- [x] 4 servicios en `com.lumina.service`. ✅
+- [x] 8 DTOs request en `com.lumina.dto.request`. ✅
+- [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
+- [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
 ## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d)
 - [ ] 4 controladores en `com.lumina.controller`.
@@ -350,6 +350,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
 
 ## Rol E: seguridad y autenticación · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-e)
+> **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
 - [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`
 - [ ] `UserService.login()` importa `com.lumina.exception.UnauthorizedException`
 - [ ] `UserController.login()` importa `com.lumina.service.UserService`

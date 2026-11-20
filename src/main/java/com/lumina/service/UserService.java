@@ -1,8 +1,16 @@
-package com.lumina.usuario;
+package com.lumina.service;
 
-import com.lumina.common.ConflictException;
-import com.lumina.common.ResourceNotFoundException;
-import com.lumina.common.UnauthorizedException;
+import com.lumina.dto.request.LoginRequest;
+import com.lumina.dto.request.RegisterRequest;
+import com.lumina.dto.request.UpdateUserRequest;
+import com.lumina.dto.response.UserResponse;
+import com.lumina.exception.ConflictException;
+import com.lumina.exception.ResourceNotFoundException;
+import com.lumina.exception.UnauthorizedException;
+import com.lumina.model.AppUser;
+import com.lumina.model.Role;
+import com.lumina.repository.AppUserRepository;
+import com.lumina.repository.RoleRepository;
 import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

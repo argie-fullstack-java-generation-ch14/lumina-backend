@@ -1,7 +1,11 @@
-package com.lumina.producto;
+package com.lumina.service;
 
-import com.lumina.common.ConflictException;
-import com.lumina.common.ResourceNotFoundException;
+import com.lumina.dto.request.ProductRequest;
+import com.lumina.exception.ConflictException;
+import com.lumina.exception.ResourceNotFoundException;
+import com.lumina.model.Product;
+import com.lumina.repository.ProductRepository;
+import com.lumina.util.SlugUtil;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
