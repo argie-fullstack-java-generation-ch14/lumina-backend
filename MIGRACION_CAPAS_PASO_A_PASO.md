@@ -148,7 +148,7 @@ git push -u origin refactor/capa-modelo
 | `com.lumina.vela.CustomCandle` | `com.lumina.model.CustomCandle` | `com.lumina.model` |
 | `com.lumina.*.SlugUtil` (si existe) | `com.lumina.util.SlugUtil` | `com.lumina.util` |
 
-### Paso 1: Mover las entidades y el enum al paquete `model`
+### Paso 1: Mover las entidades y el enum al paquete `model` ✅
 
 Para cada una de las 7 entidades/enum:
 
@@ -183,7 +183,7 @@ git mv src/main/java/com/lumina/vela/CustomCandle.java \
 
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido` ni `com.lumina.vela` dentro de los archivos de `model`.
 
-### Paso 2: Crear/mover `SlugUtil` al paquete `util`
+### Paso 2: Crear/mover `SlugUtil` al paquete `util` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/util/`.
 2. Mover `SlugUtil` con `git mv` (o crear el archivo si no existe en los paquetes viejos):
@@ -196,7 +196,7 @@ git mv <ruta-actual>/SlugUtil.java src/main/java/com/lumina/util/SlugUtil.java
 3. Actualizar el `package` a `com.lumina.util`.
 4. Revisar y corregir los imports de `SlugUtil` si hace referencia a clases de otros paquetes.
 
-### Paso 3: Revisar imports intra-paquete
+### Paso 3: Revisar imports intra-paquete ✅
 
 En todos los archivos de `model` y `util`, eliminar imports que hagan referencia a clases del mismo paquete (ya no son necesarios en Java).
 
@@ -266,7 +266,7 @@ git push -u origin refactor/capa-persistencia
 | `com.lumina.config.WebConfig` (PasswordEncoder) | `com.lumina.config.WebConfig` | `com.lumina.config` |
 | `com.lumina.config.DataInitializer` | `com.lumina.config.DataInitializer` | `com.lumina.config` |
 
-### Paso 1: Mover los repositorios al paquete `repository`
+### Paso 1: Mover los repositorios al paquete `repository` ✅
 
 1. Mover cada repositorio con `git mv`:
 
@@ -294,7 +294,7 @@ git mv src/main/java/com/lumina/vela/CustomCandleRepository.java \
 3. Actualizar el import de la entidad a `com.lumina.model.<Entidad>`.
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido` ni `com.lumina.vela`.
 
-### Paso 2: Mover excepciones y `GlobalExceptionHandler` al paquete `exception`
+### Paso 2: Mover excepciones y `GlobalExceptionHandler` al paquete `exception` ✅
 
 1. Mover cada excepción con `git mv`:
 
@@ -324,14 +324,14 @@ import com.lumina.dto.response.ApiError;
 
 4. Verificar que no queden imports de `com.lumina.common`.
 
-### Paso 3: Crear `CorsConfig` extrayendo CORS de `WebConfig`
+### Paso 3: Crear `CorsConfig` extrayendo CORS de `WebConfig` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/cors/`.
 2. Crear `CorsConfig.java` en `com.lumina.cors` con la lógica CORS extraída de `WebConfig`.
 3. En `WebConfig.java`, conservar solo el `@Bean PasswordEncoder` y eliminar la configuración CORS.
 4. Verificar que `WebConfig` quede en `com.lumina.config` con solo el bean de `PasswordEncoder`.
 
-### Paso 4: Actualizar `DataInitializer`
+### Paso 4: Actualizar `DataInitializer` ✅
 
 1. Abrir `src/main/java/com/lumina/config/DataInitializer.java`.
 2. Actualizar los imports a:
@@ -407,7 +407,7 @@ git push -u origin refactor/capa-servicios
 | `com.lumina.pedido.OrderStatusRequest` | `com.lumina.dto.request.OrderStatusRequest` | `com.lumina.dto.request` |
 | `com.lumina.vela.CustomCandleRequest` | `com.lumina.dto.request.CustomCandleRequest` | `com.lumina.dto.request` |
 
-### Paso 1: Mover los DTOs de entrada al paquete `dto/request`
+### Paso 1: Mover los DTOs de entrada al paquete `dto/request` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/dto/request/`.
 2. Mover cada DTO con `git mv`:
@@ -442,7 +442,7 @@ git mv src/main/java/com/lumina/vela/CustomCandleRequest.java \
 4. Revisar y corregir los imports que hagan referencia a `com.lumina.model` (entidades) si es necesario.
 5. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 
-### Paso 2: Mover los servicios al paquete `service`
+### Paso 2: Mover los servicios al paquete `service` ✅
 
 1. Mover cada servicio con `git mv`:
 
@@ -528,7 +528,7 @@ git push -u origin refactor/capa-api
 | `com.lumina.pedido.OrderResponse` | `com.lumina.dto.response.OrderResponse` | `com.lumina.dto.response` |
 | `com.lumina.common.ApiError` | `com.lumina.dto.response.ApiError` | `com.lumina.dto.response` |
 
-### Paso 1: Mover los DTOs de salida y `ApiError` al paquete `dto/response`
+### Paso 1: Mover los DTOs de salida y `ApiError` al paquete `dto/response` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/dto/response/`.
 2. Mover cada archivo con `git mv`:
@@ -548,7 +548,7 @@ git mv src/main/java/com/lumina/common/ApiError.java \
 4. Revisar y corregir los imports que hagan referencia a `com.lumina.model` si es necesario.
 5. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 
-### Paso 2: Mover los controladores al paquete `controller`
+### Paso 2: Mover los controladores al paquete `controller` ✅
 
 1. Mover cada controlador con `git mv`:
 
