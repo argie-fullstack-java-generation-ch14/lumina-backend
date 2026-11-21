@@ -608,11 +608,11 @@ git push origin refactor/capa-integration
 
 ## Rol E: seguridad y autenticación — Dificultad 3 de 5 — Por definir
 
-> **Nota (Rol E / autenticación de usuario):** se implementa autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
+> **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
 
-**Objetivo:** implementar seguridad con JWT (tokens de acceso) y proteger los endpoints REST por rol, siguiendo la arquitectura por capas.
+**Objetivo:** migrar los archivos relacionados con autenticación y seguridad a sus paquetes finales en la arquitectura por capas.
 
-**Por qué es 3 de 5:** agrega un nuevo paquete `security`, depende de librerías externas (jjwt, Spring Security) y requiere coordinar `WebConfig`, `UserService.login`, `UserController.login`, `DataInitializer` y los controladores.
+**Por qué es 3 de 5:** son archivos distribuidos en varios paquetes (config, usuario, common) que deben coordinarse; requiere entender cómo se usa `PasswordEncoder` entre `UserService` y `WebConfig`.
 
 ### Antes de empezar
 
@@ -625,116 +625,56 @@ git push -u origin refactor/capa-seguridad
 
 ### Mapa de archivos (actual → nuevo)
 
-| Archivo actual | Archivo nuevo | Paquete destino | Acción |
-|----------------|---------------|-----------------|--------|
-| `com.lumina.config.WebConfig` | `com.lumina.config.WebConfig` | `com.lumina.config` | Conservar solo `@Bean PasswordEncoder` |
-| `com.lumina.usuario.UserService` | `com.lumina.service.UserService` | `com.lumina.service` | Ya movido por Rol C; `login()` devuelve `AuthResponse` |
-| `com.lumina.usuario.UserController` | `com.lumina.controller.UserController` | `com.lumina.controller` | Ya movido por Rol D; `/api/login` retorna `AuthResponse` |
-| `com.lumina.common.UnauthorizedException` | `com.lumina.exception.UnauthorizedException` | `com.lumina.exception` | Ya movido por Rol B |
-| `com.lumina.config.DataInitializer` | `com.lumina.config.DataInitializer` | `com.lumina.config` | Ya movido por Rol B; crea admin de prueba |
-| (nuevo) | `com.lumina.security.JwtUtil` | `com.lumina.security` | Crear |
-| (nuevo) | `com.lumina.security.JwtFilter` | `com.lumina.security` | Crear |
-| (nuevo) | `com.lumina.security.SecurityConfig` | `com.lumina.security` | Crear |
-| (nuevo) | `com.lumina.security.RestAuthenticationEntryPoint` | `com.lumina.security` | Crear |
-| (nuevo) | `com.lumina.security.RestAccessDeniedHandler` | `com.lumina.security` | Crear |
-| (nuevo) | `com.lumina.service.UserDetailsServiceImpl` | `com.lumina.service` | Crear |
-| (nuevo) | `com.lumina.dto.response.AuthResponse` | `com.lumina.dto.response` | Crear |
+| Archivo actual | Paquete destino | Acción |
+|----------------|-----------------|--------|
+| `com.lumina.config.WebConfig` | `com.lumina.config` | Conservar solo `@Bean PasswordEncoder` |
+| `com.lumina.usuario.UserService` | `com.lumina.service` | Ya movido por Rol C; verificar `login()` |
+| `com.lumina.usuario.UserController` | `com.lumina.controller` | Ya movido por Rol D; verificar `/api/login` |
+| `com.lumina.common.UnauthorizedException` | `com.lumina.exception` | Ya movido por Rol B |
+| `com.lumina.config.DataInitializer` | `com.lumina.config` | Ya movido por Rol B; verificar roles iniciales |
 
-### Paso 1: Agregar dependencias y configuración
+### Paso 1: Verificar `WebConfig` (PasswordEncoder)
 
-**Excepción a la regla "no tocar `pom.xml`/`application.properties`":** Rol E necesita librerías de seguridad.
+Abrir `src/main/java/com/lumina/config/WebConfig.java` y confirmar que solo conserva el `@Bean PasswordEncoder` (CORS ya se extrajo a `CorsConfig` por Rol B).
 
-1. `pom.xml`: agregar `spring-boot-starter-security` y jjwt `0.12.6` (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`).
-2. `application.properties`: agregar
-   ```
-   jwt.secret=${JWT_SECRET:lumina-dev-secret-key-change-me-min-32-chars}
-   jwt.expiration=3600000
-   ```
+### Paso 2: Verificar `UserService.login()`
 
-### Paso 2: Crear el paquete `com.lumina.security`
+Abrir `src/main/java/com/lumina/service/UserService.java` y confirmar que:
+- Importa `com.lumina.exception.UnauthorizedException`
+- Usa `passwordEncoder.matches()` para validar credenciales
 
-1. `security/JwtUtil.java`: `generateToken(UserDetails)`, `extractUsername`, `isTokenValid`.
-2. `security/JwtFilter.java`: lee `Authorization: Bearer` y autentica en el `SecurityContext`.
-3. `security/SecurityConfig.java`: stateless, `csrf.disable()`, `http.cors()`, `@EnableMethodSecurity`, `addFilterBefore`.
-4. `security/RestAuthenticationEntryPoint.java`: 401 JSON con `ApiError`.
-5. `security/RestAccessDeniedHandler.java`: 403 JSON con `ApiError`.
-6. `service/UserDetailsServiceImpl.java`: implementa `UserDetailsService` por email; `.roles(role.getName())` → `ROLE_ADMIN/ROLE_CUSTOMER/ROLE_STAFF`.
-7. `dto/response/AuthResponse.java`: `record AuthResponse(String token, UserResponse user)`.
+### Paso 3: Verificar `UserController.login()`
 
-### Paso 3: Configurar CORS para Spring Security
+Abrir `src/main/java/com/lumina/controller/UserController.java` y confirmar que:
+- Importa `com.lumina.service.UserService`
+- El endpoint `POST /api/login` funciona correctamente
 
-1. `cors/CorsConfig.java`: exponer un bean `CorsConfigurationSource` con los orígenes permitidos (el `WebMvcConfigurer` actual no lo usa la cadena de seguridad).
-2. `SecurityConfig.java`: `.cors(Customizer.withDefaults())`.
+### Paso 4: Verificar `UnauthorizedException`
 
-### Paso 4: Implementar login con JWT
+Confirmar que está en `com.lumina.exception` (movido por Rol B) y que `GlobalExceptionHandler` la mapea a HTTP 401.
 
-1. `service/UserService.java`: mantener `passwordEncoder.matches` + `UnauthorizedException`, cargar `UserDetails` y generar token; retornar `AuthResponse`.
-2. `controller/UserController.java`: `POST /api/login` retorna `AuthResponse` e importa `com.lumina.service.UserService`.
+### Paso 5: Verificar `DataInitializer`
 
-### Paso 5: Proteger endpoints
+Confirmar que crea los roles iniciales (`ADMIN`, `CUSTOMER`, `STAFF`) y importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
 
-| Endpoint | Acceso |
-|---|---|
-| `POST /api/registro`, `POST /api/login` | Público |
-| `GET /api/productos/**` | Público |
-| `POST/PUT/DELETE /api/productos/**` | `@PreAuthorize("hasRole('ADMIN')")` |
-| `GET /api/usuarios`, `DELETE /api/usuarios/{id}` | `@PreAuthorize("hasRole('ADMIN')")` |
-| `GET/PUT /api/usuarios/{id}` | Autenticado |
-| `POST /api/pedidos`, `GET /api/pedidos/**` | Autenticado |
-| `PUT /api/pedidos/{id}/estado` | `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` |
-| `POST/GET/DELETE /api/velas-personalizadas/**` | Autenticado |
+### Paso 6: Checklist del Rol E
 
-Regla de URLs en `SecurityConfig`:
-```java
-.requestMatchers("/api/registro", "/api/login").permitAll()
-.requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-.anyRequest().authenticated()
-```
+- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`
+- [ ] `UserService.login()` importa `com.lumina.exception.UnauthorizedException`
+- [ ] `UserController.login()` importa `com.lumina.service.UserService`
+- [ ] `UnauthorizedException` en `com.lumina.exception`
+- [ ] `DataInitializer` crea roles iniciales correctamente
+- [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol
 
-### Paso 6: Sembrar usuario admin de prueba
-
-1. `config/DataInitializer.java`: crear `admin@lumina.com` / `Admin123` (BCrypt) con rol `ADMIN` si no existe.
-2. Nota: `database/02_seed.sql` tiene hashes falsos (`demo-hash-*`) que no sirven para iniciar sesión.
-
-### Paso 7: Checklist del Rol E
-
-- [ ] Paquete `com.lumina.security` con `JwtUtil`, `JwtFilter`, `SecurityConfig`, `RestAuthenticationEntryPoint`, `RestAccessDeniedHandler`.
-- [ ] `service/UserDetailsServiceImpl` implementa `UserDetailsService` cargando por email.
-- [ ] `dto/response/AuthResponse` con `token` y `user: UserResponse`.
-- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `UserService.login()` valida con `passwordEncoder.matches` y devuelve `AuthResponse`.
-- [ ] `UserController.login()` retorna `AuthResponse` e importa `com.lumina.service.UserService`.
-- [ ] `UnauthorizedException` en `com.lumina.exception` y mapeada a 401.
-- [ ] `DataInitializer` crea roles `ADMIN`, `CUSTOMER`, `STAFF` y un admin de prueba.
-- [ ] `CorsConfig` expone `CorsConfigurationSource` y `SecurityConfig` usa `http.cors()`.
-- [ ] `@PreAuthorize("hasRole('ADMIN')")` en escrituras de productos y usuarios.
-- [ ] `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado de pedidos.
-- [ ] Rutas públicas sin token: `POST /api/registro`, `POST /api/login`, `GET /api/productos/**`.
-- [ ] Resto de rutas `/api/**` requieren autenticación.
-- [ ] `pom.xml` y `application.properties` actualizados (excepción documentada para Rol E).
-- [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol.
-
-### Paso 8: Smoke test de seguridad
-
-1. `POST /api/registro` → `201`.
-2. `POST /api/login` → `200` con `token` y `user`.
-3. `GET /api/productos` sin token → `200`.
-4. `POST /api/productos` sin token → `401`.
-5. `POST /api/productos` con token `ADMIN` → `201`.
-6. `POST /api/pedidos` con token `CUSTOMER` → `201`.
-7. `PUT /api/pedidos/{id}/estado` con token `ADMIN/STAFF` → `200`.
-8. Token inválido → `401`.
-9. Preflight `OPTIONS` con `Origin` → cabeceras CORS.
-
-### Paso 9: Abrir el PR
+### Paso 7: Abrir el PR
 
 ```bash
 git add .
-git commit -m "feat(rol-e): implementar autenticación JWT y proteger endpoints por rol"
+git commit -m "feat(rol-e): migrar archivos de seguridad y autenticación a capas"
 git push origin refactor/capa-seguridad
 ```
 
-### Paso 10: Hacer merge de la PR a la rama base
+### Paso 8: Hacer merge de la PR a la rama base
 
 ```bash
 git switch refactor/capa-integration

@@ -75,7 +75,6 @@ El código, las rutas y los mensajes siguen en español.
 | Repositorio | `com.lumina.repository` | Interfaces `JpaRepository` |
 | Servicio | `com.lumina.service` | Lógica de negocio, `@Service`, `@Transactional` |
 | Excepción | `com.lumina.exception` | Excepciones personalizadas y `GlobalExceptionHandler` |
-| Seguridad | `com.lumina.security` | JWT, filtros de autenticación y reglas de acceso por rol |
 
 **No se mueven:** `LuminaApiApplication.java` (queda en `com.lumina`).
 
@@ -151,7 +150,6 @@ src/main/java/com/lumina
 | Excepciones + `GlobalExceptionHandler` | `com.lumina.exception` |
 | Configuración CORS | `com.lumina.cors` |
 | Configuración general | `com.lumina.config` |
-| Seguridad (JWT, filtros) | `com.lumina.security` |
 | Clase principal | `com.lumina` |
 
 ## Endpoints REST (contrato fijo)
@@ -355,7 +353,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 | **B** | Persistencia + Excepciones + CORS + Config | 6 repositorios + 5 excepciones + `GlobalExceptionHandler` + `CorsConfig` + ajustes en `WebConfig` y `DataInitializer` | `com.lumina.repository`, `com.lumina.exception`, `com.lumina.cors`, `com.lumina.config` | Nicole |
 | **C** | Servicios + DTOs de entrada | 4 servicios + 8 DTOs request | `com.lumina.service`, `com.lumina.dto.request` | Argie |
 | **D** | Controladores + DTOs de salida | 4 controladores + 3 DTOs response + `ApiError` | `com.lumina.controller`, `com.lumina.dto.response` | Naya |
-| **E** | Seguridad y Autenticación | `security` (JWT, filtros, handlers), `service/UserDetailsServiceImpl`, `dto/response/AuthResponse`, `WebConfig`, `UserService.login()`, `UserController.login()`, `DataInitializer` (admin de prueba) | `com.lumina.security`, `com.lumina.service`, `com.lumina.controller`, `com.lumina.config`, `com.lumina.exception` | Por definir (uno de los 4) |
+| **E** | Seguridad y Autenticación | `WebConfig` (PasswordEncoder), `UserService.login()`, `UserController.login()`, `UnauthorizedException`, `DataInitializer` (roles) | `com.lumina.config`, `com.lumina.service`, `com.lumina.controller`, `com.lumina.exception` | Por definir (uno de los 4) |
 | **Integración** | Build, smoke test, merge a `main`, revisión de `README.md` vs estructura final | Unir PRs A→B→C→D, ejecutar build, ejecutar smoke test, validar documentación, merge a `main`, limpiar paquetes viejos | `com.lumina` (raíz) + documentación | Argie |
 
 ### Reglas para evitar conflictos y errores de compilación
@@ -398,60 +396,13 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [x] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`. ✅
 
 ## Rol E: seguridad y autenticación · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-e)
-> **Nota (Rol E / autenticación de usuario):** se implementa autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
-
-**Objetivo:** implementar seguridad con JWT (tokens de acceso) y proteger los endpoints REST por rol, siguiendo la arquitectura por capas.
-
-**Por qué es 3 de 5:** agrega un nuevo paquete `security`, depende de librerías externas (jjwt, Spring Security) y requiere coordinar `WebConfig`, `UserService.login`, `UserController.login`, `DataInitializer` y los controladores.
-
-### Archivos creados
-- `security/JwtUtil.java` — genera, valida y extrae datos del JWT.
-- `security/JwtFilter.java` — lee `Authorization: Bearer` y autentica al usuario en el contexto de seguridad.
-- `security/SecurityConfig.java` — cadena de filtros stateless, CORS, reglas de acceso y `@EnableMethodSecurity`.
-- `security/RestAuthenticationEntryPoint.java` — devuelve 401 con `ApiError`.
-- `security/RestAccessDeniedHandler.java` — devuelve 403 con `ApiError`.
-- `service/UserDetailsServiceImpl.java` — carga al usuario por email y expone sus autoridades (`ROLE_ADMIN`, `ROLE_CUSTOMER`, `ROLE_STAFF`).
-- `dto/response/AuthResponse.java` — respuesta del login: `{ token, user: UserResponse }`.
-
-### Archivos editados
-- `config/WebConfig.java` — conserva solo `@Bean PasswordEncoder` (no declara otro en `SecurityConfig`).
-- `service/UserService.java` — `login()` valida credenciales y devuelve `AuthResponse` con token.
-- `controller/UserController.java` — `POST /api/login` retorna `AuthResponse`; `@PreAuthorize` en escrituras.
-- `controller/ProductController.java` — `@PreAuthorize("hasRole('ADMIN')")` en POST/PUT/DELETE.
-- `controller/OrderController.java` — `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado.
-- `cors/CorsConfig.java` — expone `CorsConfigurationSource` para que Spring Security respete los orígenes.
-- `config/DataInitializer.java` — crea roles iniciales y un usuario `admin` de prueba si no existe.
-- `pom.xml` — agrega `spring-boot-starter-security` y jjwt 0.12.6 (excepción a la regla "no tocar pom").
-- `application.properties` — agrega `jwt.secret` y `jwt.expiration`.
-
-### Reglas de autorización
-| Endpoint | Acceso |
-|---|---|
-| `POST /api/registro`, `POST /api/login` | Público |
-| `GET /api/productos/**` | Público |
-| `POST/PUT/DELETE /api/productos/**` | `@PreAuthorize("hasRole('ADMIN')")` |
-| `GET /api/usuarios`, `DELETE /api/usuarios/{id}` | `@PreAuthorize("hasRole('ADMIN')")` |
-| `GET/PUT /api/usuarios/{id}` | Autenticado |
-| `POST /api/pedidos`, `GET /api/pedidos/**` | Autenticado |
-| `PUT /api/pedidos/{id}/estado` | `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` |
-| `POST/GET/DELETE /api/velas-personalizadas/**` | Autenticado |
-
-### Checklist del Rol E
-- [ ] Paquete `com.lumina.security` con `JwtUtil`, `JwtFilter`, `SecurityConfig`, `RestAuthenticationEntryPoint`, `RestAccessDeniedHandler`.
-- [ ] `service/UserDetailsServiceImpl` implementa `UserDetailsService` cargando por email.
-- [ ] `dto/response/AuthResponse` con `token` y `user: UserResponse`.
-- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `UserService.login()` valida con `passwordEncoder.matches` y devuelve `AuthResponse`.
-- [ ] `UserController.login()` retorna `AuthResponse` e importa `com.lumina.service.UserService`.
-- [ ] `UnauthorizedException` en `com.lumina.exception` y mapeada a 401.
-- [ ] `DataInitializer` crea roles `ADMIN`, `CUSTOMER`, `STAFF` y un admin de prueba.
-- [ ] `CorsConfig` expone `CorsConfigurationSource` y `SecurityConfig` usa `http.cors()`.
-- [ ] `@PreAuthorize("hasRole('ADMIN')")` en escrituras de productos y usuarios.
-- [ ] `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado de pedidos.
-- [ ] Rutas públicas sin token: `POST /api/registro`, `POST /api/login`, `GET /api/productos/**`.
-- [ ] Resto de rutas `/api/**` requieren autenticación.
-- [ ] `pom.xml` y `application.properties` actualizados (excepción documentada para Rol E).
-- [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol.
+> **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
+- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`
+- [ ] `UserService.login()` importa `com.lumina.exception.UnauthorizedException`
+- [ ] `UserController.login()` importa `com.lumina.service.UserService`
+- [ ] `UnauthorizedException` en `com.lumina.exception`
+- [ ] `DataInitializer` crea roles iniciales (`ADMIN`, `CUSTOMER`, `STAFF`)
+- [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol
 
 **Argie (Integración y validación de documentación — además del Rol C)**
 - [x] Unir PRs A→B→C→D en `refactor/capa-integration`. ✅
