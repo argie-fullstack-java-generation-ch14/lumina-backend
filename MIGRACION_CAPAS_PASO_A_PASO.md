@@ -702,12 +702,14 @@ git push origin refactor/capa-integration
 git switch refactor/capa-integration
 git pull
 ```
+- [x] Paso 1 completado: PRs A→B→C→D unidos en `refactor/capa-integration`. ✅
 
 ### Paso 2: Ejecutar el build completo
 
 ```bash
 mvn -q -DskipTests package
 ```
+- [x] Paso 2 completado: build completo verde. ✅
 
 ### Paso 3: Verificar que no queden paquetes viejos
 
@@ -715,6 +717,7 @@ mvn -q -DskipTests package
 grep -REn "package com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
 grep -REn "import com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
 ```
+- [x] Paso 3 completado: no quedan paquetes viejos. ✅
 
 ### Paso 4: Verificar la estructura de directorios
 
@@ -723,6 +726,7 @@ find src/main/java/com/lumina -maxdepth 3 -type d | sort
 ```
 
 Debe mostrar: `config`, `controller`, `dto`, `dto/request`, `dto/response`, `cors`, `exception`, `model`, `repository`, `service` (y opcionalmente `util`).
+- [x] Paso 4 completado: estructura de directorios correcta. ✅
 
 ### Paso 5: Smoke test final (H2)
 
@@ -741,6 +745,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=h2 -Dspring-boot.run.arguments=--
    - `GET /api/productos?categoria=navidad`
 
 3. Resultado esperado: mismos valores funcionales que antes de la migración.
+- [x] Paso 5 completado: smoke test H2 aprobado. ✅
 
 ### Paso 6: Validar la documentación (`README.md`)
 
@@ -764,6 +769,7 @@ src/main/java/com/lumina
 
 3. Verificar que el flujo de dependencias entre capas esté documentado correctamente.
 4. Guardar los cambios si es necesario.
+- [x] Paso 6 completado: `README.md` validado contra la estructura final por capas. ✅
 
 ### Paso 7: Merge a `main`
 
@@ -775,6 +781,7 @@ git pull
 git merge --no-ff refactor/capa-integration
 git push origin main
 ```
+- [ ] Paso 7: Mergear `refactor/capa-integration` a `main` (pendiente, acción manual).
 
 ### Paso 8: Limpieza — eliminar paquetes viejos
 
@@ -785,6 +792,7 @@ Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 - `pedido`
 - `vela`
 - `common`
+- [x] Paso 8 completado: paquetes viejos eliminados. ✅
 
 ### Checklist de Integración (Argie)
 
