@@ -96,7 +96,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 
 ---
 
-## 10. Implementación por fases
+## 7. Implementación por fases
 
 ### Fase 1: Dependencias y configuración base
 
@@ -143,7 +143,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 
 ---
 
-## 11. Smoke test de aceptación (H2, puerto 18080)
+## 8. Smoke test de aceptación (H2, puerto 18080)
 
 1. `POST /api/registro` → `201`.
 2. `POST /api/login` → `200` con `token` y `user`.
@@ -157,7 +157,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 
 ---
 
-## 12. Datos de prueba
+## 9. Datos de prueba
 
 `DataInitializer` crea un usuario admin de prueba (`admin@lumina.com` / `Admin123`, BCrypt) si no existe.
 
@@ -165,7 +165,7 @@ Nota: `database/02_seed.sql` tiene hashes falsos (`demo-hash-*`) que no sirven p
 
 ---
 
-## 13. Git y PR
+## 10. Git y PR
 
 Rama: `refactor/capa-seguridad` (desde `main`).
 
