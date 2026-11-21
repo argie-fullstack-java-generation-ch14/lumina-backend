@@ -31,8 +31,8 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 | `pom.xml` | Agrega `spring-boot-starter-security` y jjwt `0.12.6` (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`). |
 | `application.properties` | Agrega `jwt.secret=${JWT_SECRET:lumina-dev-secret-key-change-me-min-32-chars}` y `jwt.expiration=3600000`. |
 | `config/WebConfig.java` | Conserva solo `@Bean PasswordEncoder` (no declara otro en `SecurityConfig`). |
-| `service/UserService.java` | `login()` valida credenciales con `passwordEncoder.matches`, genera el token y devuelve `AuthResponse`. |
-| `controller/UserController.java` | `POST /api/login` retorna `AuthResponse`; importa `com.lumina.service.UserService`. |
+| `controller/AuthController.java` | `POST /api/login` usa `AuthenticationManager.authenticate()`, `UserDetailsServiceImpl` y `JwtUtil` para generar el token y devuelve `AuthResponse`. |
+| `controller/UserController.java` | Ya no maneja `/api/login` (se movió a `AuthController`). |
 | `controller/ProductController.java` | `@PreAuthorize("hasRole('ADMIN')")` en POST/PUT/DELETE. |
 | `controller/OrderController.java` | `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado. |
 | `cors/CorsConfig.java` | Expone `CorsConfigurationSource` para que Spring Security respete los orígenes. |
@@ -68,7 +68,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 ## 5. Flujo de autenticación
 
 1. Cliente envía `POST /api/login` con `{ email, password }`.
-2. `UserService.login` valida con `passwordEncoder.matches`; si falla lanza `UnauthorizedException` (401).
+2. `AuthController.login` autentica con `AuthenticationManager.authenticate()`; si falla lanza error 401.
 3. Si es válido, carga `UserDetails` vía `UserDetailsServiceImpl` y genera el JWT con `JwtUtil`.
 4. Responde `200` con `AuthResponse { token, user: UserResponse }`.
 5. En peticiones siguientes, el cliente envía `Authorization: Bearer <token>`.
@@ -83,8 +83,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 - [ ] `service/UserDetailsServiceImpl` implementa `UserDetailsService` cargando por email.
 - [ ] `dto/response/AuthResponse` con `token` y `user: UserResponse`.
 - [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `UserService.login()` valida con `passwordEncoder.matches` y devuelve `AuthResponse`.
-- [ ] `UserController.login()` retorna `AuthResponse` e importa `com.lumina.service.UserService`.
+- [ ] `AuthController.login()` usa `AuthenticationManager.authenticate()` y devuelve `AuthResponse`.
 - [ ] `UnauthorizedException` en `com.lumina.exception` mapeada a 401 en `GlobalExceptionHandler`.
 - [ ] `DataInitializer` crea roles `ADMIN`, `CUSTOMER`, `STAFF` y un admin de prueba.
 - [ ] `CorsConfig` expone `CorsConfigurationSource`; `SecurityConfig` usa `http.cors()`.
