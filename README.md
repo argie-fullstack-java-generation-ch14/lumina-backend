@@ -112,6 +112,32 @@ POST /api/pedidos
 }
 ```
 
+Login:
+
+```json
+POST /api/login
+{
+  "email": "admin@lumina.com",
+  "password": "Admin123"
+}
+```
+
+Respuesta de login (ejemplo):
+
+```json
+{
+  "token": "eyJhbG...",
+  "user": {
+    "id": 1,
+    "fullName": "Administrador",
+    "phone": "3000000000",
+    "email": "admin@lumina.com",
+    "role": "ADMIN",
+    "createdAt": "2026-...-T..:..:.."
+  }
+}
+```
+
 Los errores siempre tienen esta forma:
 
 ```json
@@ -124,13 +150,23 @@ Los errores siempre tienen esta forma:
 }
 ```
 
-Códigos: `400` datos inválidos, `401` login incorrecto, `404` no existe, `409` ya existe o hay datos que dependen de él.
+Códigos: `400` datos inválidos, `401` login incorrecto o token faltante/inválido, `403` rol no autorizado, `404` no existe, `409` ya existe o hay datos que dependen de él.
 
 ## Cosas a tener en cuenta
 
 - Las contraseñas se guardan con BCrypt. Los usuarios de `02_seed.sql` tienen contraseñas de mentira
   (`demo-hash-...`), por eso no se puede iniciar sesión con ellos: crea una cuenta nueva con `/api/registro`.
-- Todavía no hay JWT. Los endpoints de administración (crear o borrar productos, cambiar estados de pedidos, etc.) están abiertos.
-  Es el siguiente paso para restringirlos por rol.
+- La autenticación se hace con JWT:
+  - `POST /api/login` devuelve `{ token, user }`. Guarda el `token` y envíalo en las peticiones protegidas
+    como cabecera `Authorization: Bearer <token>`.
+  - Rutas públicas (sin token): `POST /api/registro`, `POST /api/login`, `GET /api/productos/**`.
+  - Rutas protegidas (requieren token): el resto de `/api/**`.
+  - Rutas de administración (`POST/PUT/DELETE /api/productos`, `GET/DELETE /api/usuarios`,
+    `PUT /api/pedidos/{id}/estado`) requieren rol `ADMIN` o `ADMIN/STAFF` según corresponda.
+- El usuario admin de prueba se crea al iniciar la app (`admin@lumina.com` / `Admin123`, BCrypt)
+  si no existe en la base de datos.
 - CORS permite `localhost:3000`, `localhost:5500` y `127.0.0.1:5500` (dev) y la página de GitHub Pages del equipo.
   Si el frontend corre en otro puerto, se agrega en `cors/CorsConfig.java`.
+
+**En Postman:** después de hacer `POST /api/login`, copia el valor del `token` y úsalo en la pestaña
+`Authorization` → `Type: Bearer Token` → `Token: <tu_token>` para las peticiones protegidas.
