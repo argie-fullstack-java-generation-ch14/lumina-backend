@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,12 +54,14 @@ public class ProductController {
   // POST /api/productos
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasRole('ADMIN')")
   public Product create(@Valid @RequestBody ProductRequest request) {
     return productService.create(request);
   }
 
   // PUT /api/productos/4
   @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public Product update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
     return productService.update(id, request);
   }
@@ -66,6 +69,7 @@ public class ProductController {
   // DELETE /api/productos/4
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasRole('ADMIN')")
   public void delete(@PathVariable Long id) {
     productService.delete(id);
   }

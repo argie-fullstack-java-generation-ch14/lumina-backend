@@ -31,8 +31,8 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 | `pom.xml` | Agrega `spring-boot-starter-security` y jjwt `0.12.6` (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`). |
 | `application.properties` | Agrega `jwt.secret=${JWT_SECRET:lumina-dev-secret-key-change-me-min-32-chars}` y `jwt.expiration=3600000`. |
 | `config/WebConfig.java` | Conserva solo `@Bean PasswordEncoder` (no declara otro en `SecurityConfig`). |
-| `service/UserService.java` | `login()` valida credenciales con `passwordEncoder.matches`, genera el token y devuelve `AuthResponse`. |
-| `controller/UserController.java` | `POST /api/login` retorna `AuthResponse`; importa `com.lumina.service.UserService`. |
+| `controller/AuthController.java` | `POST /api/login` usa `AuthenticationManager.authenticate()`, `UserDetailsServiceImpl` y `JwtUtil` para generar el token y devuelve `AuthResponse`. |
+| `controller/UserController.java` | Ya no maneja `/api/login` (se movió a `AuthController`). |
 | `controller/ProductController.java` | `@PreAuthorize("hasRole('ADMIN')")` en POST/PUT/DELETE. |
 | `controller/OrderController.java` | `@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado. |
 | `cors/CorsConfig.java` | Expone `CorsConfigurationSource` para que Spring Security respete los orígenes. |
@@ -68,7 +68,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 ## 5. Flujo de autenticación
 
 1. Cliente envía `POST /api/login` con `{ email, password }`.
-2. `UserService.login` valida con `passwordEncoder.matches`; si falla lanza `UnauthorizedException` (401).
+2. `AuthController.login` autentica con `AuthenticationManager.authenticate()`; si falla lanza error 401.
 3. Si es válido, carga `UserDetails` vía `UserDetailsServiceImpl` y genera el JWT con `JwtUtil`.
 4. Responde `200` con `AuthResponse { token, user: UserResponse }`.
 5. En peticiones siguientes, el cliente envía `Authorization: Bearer <token>`.
@@ -83,8 +83,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 - [ ] `service/UserDetailsServiceImpl` implementa `UserDetailsService` cargando por email.
 - [ ] `dto/response/AuthResponse` con `token` y `user: UserResponse`.
 - [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `UserService.login()` valida con `passwordEncoder.matches` y devuelve `AuthResponse`.
-- [ ] `UserController.login()` retorna `AuthResponse` e importa `com.lumina.service.UserService`.
+- [ ] `AuthController.login()` usa `AuthenticationManager.authenticate()` y devuelve `AuthResponse`.
 - [ ] `UnauthorizedException` en `com.lumina.exception` mapeada a 401 en `GlobalExceptionHandler`.
 - [ ] `DataInitializer` crea roles `ADMIN`, `CUSTOMER`, `STAFF` y un admin de prueba.
 - [ ] `CorsConfig` expone `CorsConfigurationSource`; `SecurityConfig` usa `http.cors()`.
@@ -97,17 +96,50 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 
 ---
 
-## 7. Smoke test de aceptación (H2, puerto 18080)
+## 7. Implementación por fases ✅
 
-1. `POST /api/registro` → `201`.
-2. `POST /api/login` → `200` con `token` y `user`.
-3. `GET /api/productos` sin token → `200`.
-4. `POST /api/productos` sin token → `401`.
-5. `POST /api/productos` con token `ADMIN` → `201`.
-6. `POST /api/pedidos` con token `CUSTOMER` → `201`.
-7. `PUT /api/pedidos/{id}/estado` con token `ADMIN/STAFF` → `200`.
-8. Token inválido → `401`.
-9. Preflight `OPTIONS` con `Origin` → cabeceras CORS presentes.
+### Fase 1: Dependencias y configuración base ✅
+
+- [x] Agregar `spring-boot-starter-security` y jjwt `0.12.6` (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`) a `pom.xml`.
+- [x] Agregar `jwt.secret` y `jwt.expiration` a `application.properties`.
+- [x] Verificar que `WebConfig` conserve solo `@Bean PasswordEncoder`.
+- [x] Ejecutar `mvn -q -DskipTests compile` y confirmar que no hay errores de dependencias.
+
+### Fase 2: Utilidades y servicios de seguridad ✅
+
+- [x] Crear `security/JwtUtil.java` (generar, validar y extraer datos del JWT).
+- [x] Crear `service/UserDetailsServiceImpl.java` (implementa UserDetailsService, carga usuario por email, autoridades `ROLE_ADMIN`, `ROLE_CUSTOMER`, `ROLE_STAFF`).
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
+
+### Fase 3: Filtros y manejo de errores de seguridad ✅
+
+- [x] Crear `security/JwtFilter.java` (lee `Authorization: Bearer`, valida token, autentica en `SecurityContext`).
+- [x] Crear `security/RestAuthenticationEntryPoint.java` (devuelve 401 con cuerpo `ApiError`).
+- [x] Crear `security/RestAccessDeniedHandler.java` (devuelve 403 con cuerpo `ApiError`).
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
+
+### Fase 4: Configuración de Spring Security y CORS ✅
+
+- [x] Crear `security/SecurityConfig.java` (`@EnableWebSecurity`, `@EnableMethodSecurity`, `SecurityFilterChain` stateless, `JwtFilter` antes de `UsernamePasswordAuthenticationFilter`, reglas de URL, `http.cors()`).
+- [x] Editar `cors/CorsConfig.java` para exponer `CorsConfigurationSource`.
+- [x] Editar `config/DataInitializer.java` para crear roles `ADMIN`, `CUSTOMER`, `STAFF` y usuario `admin` de prueba.
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
+
+### Fase 5: Controladores y endpoints protegidos ✅
+
+- [x] Crear `dto/response/AuthResponse.java` (`record AuthResponse(String token, UserResponse user)`).
+- [x] Crear `controller/AuthController.java` (`POST /api/login` con `AuthenticationManager.authenticate()`, `UserDetailsServiceImpl`, `JwtUtil`; devuelve `AuthResponse`).
+- [x] Editar `controller/UserController.java` (quitar manejo de `/api/login`, se movió a `AuthController`).
+- [x] Editar `controller/ProductController.java` (`@PreAuthorize("hasRole('ADMIN')")` en POST/PUT/DELETE).
+- [x] Editar `controller/OrderController.java` (`@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado de pedidos).
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
+
+### Fase 6: Pruebas y validación
+
+- [ ] Ejecutar `mvn spring-boot:run` con MySQL conectado.
+- [ ] Probar en Postman: `POST /api/registro`, `POST /api/login`, `GET /api/productos` (público), endpoints protegidos con y sin token.
+- [ ] Verificar códigos 401 y 403 con cuerpo `ApiError`.
+- [ ] Verificar preflight `OPTIONS` con cabeceras CORS presentes.
 
 ---
 
