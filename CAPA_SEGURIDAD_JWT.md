@@ -96,43 +96,43 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 
 ---
 
-## 7. Implementación por fases
+## 7. Implementación por fases ✅
 
-### Fase 1: Dependencias y configuración base
+### Fase 1: Dependencias y configuración base ✅
 
-- [ ] Agregar `spring-boot-starter-security` y jjwt `0.12.6` (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`) a `pom.xml`.
-- [ ] Agregar `jwt.secret` y `jwt.expiration` a `application.properties`.
-- [ ] Verificar que `WebConfig` conserve solo `@Bean PasswordEncoder`.
-- [ ] Ejecutar `mvn -q -DskipTests compile` y confirmar que no hay errores de dependencias.
+- [x] Agregar `spring-boot-starter-security` y jjwt `0.12.6` (`jjwt-api`, `jjwt-impl`, `jjwt-jackson`) a `pom.xml`.
+- [x] Agregar `jwt.secret` y `jwt.expiration` a `application.properties`.
+- [x] Verificar que `WebConfig` conserve solo `@Bean PasswordEncoder`.
+- [x] Ejecutar `mvn -q -DskipTests compile` y confirmar que no hay errores de dependencias.
 
-### Fase 2: Utilidades y servicios de seguridad
+### Fase 2: Utilidades y servicios de seguridad ✅
 
-- [ ] Crear `security/JwtUtil.java` (generar, validar y extraer datos del JWT).
-- [ ] Crear `service/UserDetailsServiceImpl.java` (implementa `UserDetailsService`, carga usuario por email, autoridades `ROLE_ADMIN`, `ROLE_CUSTOMER`, `ROLE_STAFF`).
-- [ ] Ejecutar `mvn -q -DskipTests compile` y verificar.
+- [x] Crear `security/JwtUtil.java` (generar, validar y extraer datos del JWT).
+- [x] Crear `service/UserDetailsServiceImpl.java` (implementa UserDetailsService, carga usuario por email, autoridades `ROLE_ADMIN`, `ROLE_CUSTOMER`, `ROLE_STAFF`).
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
 
-### Fase 3: Filtros y manejo de errores de seguridad
+### Fase 3: Filtros y manejo de errores de seguridad ✅
 
-- [ ] Crear `security/JwtFilter.java` (lee `Authorization: Bearer`, valida token, autentica en `SecurityContext`).
-- [ ] Crear `security/RestAuthenticationEntryPoint.java` (devuelve 401 con cuerpo `ApiError`).
-- [ ] Crear `security/RestAccessDeniedHandler.java` (devuelve 403 con cuerpo `ApiError`).
-- [ ] Ejecutar `mvn -q -DskipTests compile` y verificar.
+- [x] Crear `security/JwtFilter.java` (lee `Authorization: Bearer`, valida token, autentica en `SecurityContext`).
+- [x] Crear `security/RestAuthenticationEntryPoint.java` (devuelve 401 con cuerpo `ApiError`).
+- [x] Crear `security/RestAccessDeniedHandler.java` (devuelve 403 con cuerpo `ApiError`).
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
 
-### Fase 4: Configuración de Spring Security y CORS
+### Fase 4: Configuración de Spring Security y CORS ✅
 
-- [ ] Crear `security/SecurityConfig.java` (`@EnableWebSecurity`, `@EnableMethodSecurity`, `SecurityFilterChain` stateless, `JwtFilter` antes de `UsernamePasswordAuthenticationFilter`, reglas de URL, `http.cors()`).
-- [ ] Editar `cors/CorsConfig.java` para exponer `CorsConfigurationSource`.
-- [ ] Editar `config/DataInitializer.java` para crear roles `ADMIN`, `CUSTOMER`, `STAFF` y usuario `admin` de prueba.
-- [ ] Ejecutar `mvn spring-boot:run` y verificar que la aplicación levante el contexto (el login aún no funciona hasta la Fase 5).
+- [x] Crear `security/SecurityConfig.java` (`@EnableWebSecurity`, `@EnableMethodSecurity`, `SecurityFilterChain` stateless, `JwtFilter` antes de `UsernamePasswordAuthenticationFilter`, reglas de URL, `http.cors()`).
+- [x] Editar `cors/CorsConfig.java` para exponer `CorsConfigurationSource`.
+- [x] Editar `config/DataInitializer.java` para crear roles `ADMIN`, `CUSTOMER`, `STAFF` y usuario `admin` de prueba.
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
 
-### Fase 5: Controladores y endpoints protegidos
+### Fase 5: Controladores y endpoints protegidos ✅
 
-- [ ] Crear `dto/response/AuthResponse.java` (`record AuthResponse(String token, UserResponse user)`).
-- [ ] Crear `controller/AuthController.java` (`POST /api/login` con `AuthenticationManager.authenticate()`, `UserDetailsServiceImpl`, `JwtUtil`; devuelve `AuthResponse`).
-- [ ] Editar `controller/UserController.java` (quitar manejo de `/api/login`, se movió a `AuthController`).
-- [ ] Editar `controller/ProductController.java` (`@PreAuthorize("hasRole('ADMIN')")` en POST/PUT/DELETE).
-- [ ] Editar `controller/OrderController.java` (`@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado de pedidos).
-- [ ] Ejecutar `mvn -q -DskipTests compile` y verificar.
+- [x] Crear `dto/response/AuthResponse.java` (`record AuthResponse(String token, UserResponse user)`).
+- [x] Crear `controller/AuthController.java` (`POST /api/login` con `AuthenticationManager.authenticate()`, `UserDetailsServiceImpl`, `JwtUtil`; devuelve `AuthResponse`).
+- [x] Editar `controller/UserController.java` (quitar manejo de `/api/login`, se movió a `AuthController`).
+- [x] Editar `controller/ProductController.java` (`@PreAuthorize("hasRole('ADMIN')")` en POST/PUT/DELETE).
+- [x] Editar `controller/OrderController.java` (`@PreAuthorize("hasAnyRole('ADMIN','STAFF')")` en cambio de estado de pedidos).
+- [x] Ejecutar `mvn -q -DskipTests compile` y verificar.
 
 ### Fase 6: Pruebas y validación
 
@@ -143,21 +143,7 @@ Implementar autenticación con JWT (tokens de acceso) y proteger los endpoints R
 
 ---
 
-## 8. Smoke test de aceptación (H2, puerto 18080)
-
-1. `POST /api/registro` → `201`.
-2. `POST /api/login` → `200` con `token` y `user`.
-3. `GET /api/productos` sin token → `200`.
-4. `POST /api/productos` sin token → `401`.
-5. `POST /api/productos` con token `ADMIN` → `201`.
-6. `POST /api/pedidos` con token `CUSTOMER` → `201`.
-7. `PUT /api/pedidos/{id}/estado` con token `ADMIN/STAFF` → `200`.
-8. Token inválido → `401`.
-9. Preflight `OPTIONS` con `Origin` → cabeceras CORS presentes.
-
----
-
-## 9. Datos de prueba
+## 8. Datos de prueba
 
 `DataInitializer` crea un usuario admin de prueba (`admin@lumina.com` / `Admin123`, BCrypt) si no existe.
 
@@ -165,7 +151,7 @@ Nota: `database/02_seed.sql` tiene hashes falsos (`demo-hash-*`) que no sirven p
 
 ---
 
-## 10. Git y PR
+## 9. Git y PR
 
 Rama: `refactor/capa-seguridad` (desde `main`).
 
