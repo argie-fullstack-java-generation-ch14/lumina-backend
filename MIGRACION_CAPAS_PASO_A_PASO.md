@@ -63,6 +63,54 @@ controller  →  service  →  repository  →  model
 
 ---
 
+## Endpoints REST (contrato fijo)
+
+La migración **no cambia rutas ni anotaciones Spring**. Los endpoints viven en los 4 controladores y el Rol D solo los mueve a `com.lumina.controller` conservando `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@PutMapping` y `@DeleteMapping` tal cual. CORS aplica a `/api/**` (`CorsConfig`).
+
+### Usuarios — `UserController` (`@RequestMapping("/api")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/registro` | Crea cuenta con rol `CUSTOMER`. Responde `201`. Body: `RegisterRequest`. |
+| POST | `/api/login` | Valida credenciales con `PasswordEncoder`. Body: `LoginRequest`. |
+| GET | `/api/usuarios` | Lista `UserResponse`. |
+| GET | `/api/usuarios/{id}` | Un `UserResponse` por id. |
+| PUT | `/api/usuarios/{id}` | Actualiza nombre y teléfono. Body: `UpdateUserRequest`. |
+| DELETE | `/api/usuarios/{id}` | Responde `204`. |
+
+### Productos — `ProductController` (`@RequestMapping("/api/productos")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/productos` | Filtros opcionales: `?categoria=navidad&disponibles=true`. |
+| GET | `/api/productos/{id}` | Un producto por id. |
+| GET | `/api/productos/slug/{slug}` | Un producto por slug. |
+| POST | `/api/productos` | Responde `201`. Body: `ProductRequest` con `category` como texto. |
+| PUT | `/api/productos/{id}` | Actualiza producto. Body: `ProductRequest`. |
+| DELETE | `/api/productos/{id}` | Responde `204`. |
+
+### Pedidos — `OrderController` (`@RequestMapping("/api/pedidos")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/pedidos` | Responde `201`. Body: `OrderRequest`. Calcula totales y descuenta stock. |
+| GET | `/api/pedidos` | Filtro opcional: `?usuarioId=2`. |
+| GET | `/api/pedidos/{id}` | Un `OrderResponse` por id. |
+| PUT | `/api/pedidos/{id}/estado` | Body: `OrderStatusRequest`, por ejemplo `{"status":"CONFIRMED"}`. |
+
+### Velas personalizadas — `CustomCandleController` (`@RequestMapping("/api/velas-personalizadas")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/velas-personalizadas` | Responde `201`. Body: `CustomCandleRequest`. |
+| GET | `/api/velas-personalizadas` | Requiere `?usuarioId=`. |
+| GET | `/api/velas-personalizadas/{id}` | Una vela personalizada por id. |
+| DELETE | `/api/velas-personalizadas/{id}` | Responde `204`. |
+
+**Total: 20 endpoints.** Esta lista debe coincidir con `README.md` (sección Endpoints) después de la migración; si algo difiere, es un error de integración.
+
+---
+
 ## Orden recomendado de integración
 
 Los PR se unen en este orden: **A → B → C → D → E**. Argie (Rol C) es responsable de unir los PR, validar la documentación, ejecutar el build, el smoke test y hacer el merge a `main`. El build completo se valida en la rama de integración, no en ramas parciales. `main` no recibe merges hasta que la integración compile y pase el smoke test.
@@ -152,12 +200,12 @@ git mv <ruta-actual>/SlugUtil.java src/main/java/com/lumina/util/SlugUtil.java
 
 En todos los archivos de `model` y `util`, eliminar imports que hagan referencia a clases del mismo paquete (ya no son necesarios en Java).
 
-### Paso 4: Checklist del Rol A
+### Paso 4: Checklist del Rol A ✅
 
-- [ ] 7 entidades/enum en `com.lumina.model` con `package` actualizado.
-- [ ] `SlugUtil` en `com.lumina.util`.
-- [ ] Quitar imports de clases que ahora están en el mismo paquete `model`.
-- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`.
+- [x] 7 entidades/enum en `com.lumina.model` con `package` actualizado. ✅
+- [x] `SlugUtil` en `com.lumina.util`. ✅
+- [x] Quitar imports de clases que ahora están en el mismo paquete `model`. ✅
+- [x] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`. ✅
 
 ### Paso 5: Abrir el PR
 
@@ -295,14 +343,14 @@ import com.lumina.repository.RoleRepository;
 
 3. Eliminar cualquier import de `com.lumina.usuario` o `com.lumina.common`.
 
-### Paso 5: Checklist del Rol B
+### Paso 5: Checklist del Rol B ✅
 
-- [ ] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`.
-- [ ] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`.
-- [ ] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`.
-- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
-- [ ] Sin imports de `com.lumina.common` en archivos de este rol.
+- [x] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`. ✅
+- [x] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`. ✅
+- [x] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`. ✅
+- [x] `WebConfig` conserva solo `@Bean PasswordEncoder`. ✅
+- [x] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`. ✅
+- [x] Sin imports de `com.lumina.common` en archivos de este rol. ✅
 
 ### Paso 6: Abrir el PR
 
@@ -423,12 +471,12 @@ git mv src/main/java/com/lumina/vela/CustomCandleService.java \
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 5. Asegurar que el servicio no importe ni dependa de ningún controlador (dependencia hacia atrás prohibida).
 
-### Paso 3: Checklist del Rol C
+### Paso 3: Checklist del Rol C ✅
 
-- [ ] 4 servicios en `com.lumina.service`.
-- [ ] 8 DTOs request en `com.lumina.dto.request`.
-- [ ] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`.
-- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`.
+- [x] 4 servicios en `com.lumina.service`. ✅
+- [x] 8 DTOs request en `com.lumina.dto.request`. ✅
+- [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
+- [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
 ### Paso 4: Abrir el PR
 
@@ -559,6 +607,8 @@ git push origin refactor/capa-integration
 <a id="rol-e"></a>
 
 ## Rol E: seguridad y autenticación — Dificultad 3 de 5 — Por definir
+
+> **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
 
 **Objetivo:** migrar los archivos relacionados con autenticación y seguridad a sus paquetes finales en la arquitectura por capas.
 

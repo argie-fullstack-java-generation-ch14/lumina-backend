@@ -152,6 +152,52 @@ src/main/java/com/lumina
 | Configuración general | `com.lumina.config` |
 | Clase principal | `com.lumina` |
 
+## Endpoints REST (contrato fijo)
+
+La migración **no cambia rutas ni anotaciones Spring**. Los endpoints viven en los 4 controladores y el Rol D solo los mueve a `com.lumina.controller` conservando `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@PutMapping` y `@DeleteMapping` tal cual. CORS aplica a `/api/**` (`CorsConfig`).
+
+### Usuarios — `UserController` (`@RequestMapping("/api")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/registro` | Crea cuenta con rol `CUSTOMER`. Responde `201`. Body: `RegisterRequest`. |
+| POST | `/api/login` | Valida credenciales con `PasswordEncoder`. Body: `LoginRequest`. |
+| GET | `/api/usuarios` | Lista `UserResponse`. |
+| GET | `/api/usuarios/{id}` | Un `UserResponse` por id. |
+| PUT | `/api/usuarios/{id}` | Actualiza nombre y teléfono. Body: `UpdateUserRequest`. |
+| DELETE | `/api/usuarios/{id}` | Responde `204`. |
+
+### Productos — `ProductController` (`@RequestMapping("/api/productos")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/productos` | Filtros opcionales: `?categoria=navidad&disponibles=true`. |
+| GET | `/api/productos/{id}` | Un producto por id. |
+| GET | `/api/productos/slug/{slug}` | Un producto por slug. |
+| POST | `/api/productos` | Responde `201`. Body: `ProductRequest` con `category` como texto. |
+| PUT | `/api/productos/{id}` | Actualiza producto. Body: `ProductRequest`. |
+| DELETE | `/api/productos/{id}` | Responde `204`. |
+
+### Pedidos — `OrderController` (`@RequestMapping("/api/pedidos")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/pedidos` | Responde `201`. Body: `OrderRequest`. Calcula totales y descuenta stock. |
+| GET | `/api/pedidos` | Filtro opcional: `?usuarioId=2`. |
+| GET | `/api/pedidos/{id}` | Un `OrderResponse` por id. |
+| PUT | `/api/pedidos/{id}/estado` | Body: `OrderStatusRequest`, por ejemplo `{"status":"CONFIRMED"}`. |
+
+### Velas personalizadas — `CustomCandleController` (`@RequestMapping("/api/velas-personalizadas")`)
+
+| Método | Ruta | Notas |
+|---|---|---|
+| POST | `/api/velas-personalizadas` | Responde `201`. Body: `CustomCandleRequest`. |
+| GET | `/api/velas-personalizadas` | Requiere `?usuarioId=`. |
+| GET | `/api/velas-personalizadas/{id}` | Una vela personalizada por id. |
+| DELETE | `/api/velas-personalizadas/{id}` | Responde `204`. |
+
+**Total: 20 endpoints.** Esta lista debe coincidir con `README.md` (sección Endpoints) después de la migración; si algo difiere, es un error de integración.
+
 ## Glosario breve
 
 - **FQCN** (nombre completo de la clase, incluyendo su paquete): por ejemplo, `com.lumina.model.AppUser`.
@@ -324,25 +370,25 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 
 ### Checklist rápido por rol
 
-## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-a)
-- [ ] 7 entidades en `com.lumina.model` con `package` actualizado.
-- [ ] `SlugUtil` en `com.lumina.util`.
-- [ ] Quitar imports de clases que ahora están en el mismo paquete `model`.
-- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`.
+## Rol A: modelo y utilidades · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-a) ✅
+- [x] 7 entidades en `com.lumina.model` con `package` actualizado. ✅
+- [x] `SlugUtil` en `com.lumina.util`. ✅
+- [x] Quitar imports de clases que ahora están en el mismo paquete `model`. ✅
+- [x] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`. ✅
 
-## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-b)
-- [ ] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`.
-- [ ] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`.
-- [ ] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`.
-- [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`.
-- [ ] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`.
-- [ ] Sin imports de `com.lumina.common` en archivos de este rol.
+## Rol B: persistencia, excepciones y configuración · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-b) ✅
+- [x] 6 repositorios en `com.lumina.repository` importando entidades de `com.lumina.model`. ✅
+- [x] 5 excepciones + `GlobalExceptionHandler` en `com.lumina.exception`. ✅
+- [x] `CorsConfig` creado en `com.lumina.cors` extrayendo CORS de `WebConfig`. ✅
+- [x] `WebConfig` conserva solo `@Bean PasswordEncoder`. ✅
+- [x] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`. ✅
+- [x] Sin imports de `com.lumina.common` en archivos de este rol. ✅
 
-## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-c)
-- [ ] 4 servicios en `com.lumina.service`.
-- [ ] 8 DTOs request en `com.lumina.dto.request`.
-- [ ] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`.
-- [ ] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`.
+## Rol C: servicios y DTOs de entrada · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-c) ✅
+- [x] 4 servicios en `com.lumina.service`. ✅
+- [x] 8 DTOs request en `com.lumina.dto.request`. ✅
+- [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
+- [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
 ## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d)
 - [ ] 4 controladores en `com.lumina.controller`.
@@ -350,6 +396,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
 
 ## Rol E: seguridad y autenticación · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-e)
+> **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
 - [ ] `WebConfig` conserva solo `@Bean PasswordEncoder`
 - [ ] `UserService.login()` importa `com.lumina.exception.UnauthorizedException`
 - [ ] `UserController.login()` importa `com.lumina.service.UserService`
