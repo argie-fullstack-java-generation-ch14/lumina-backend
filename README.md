@@ -10,7 +10,12 @@ API REST de Lumina hecha con Spring Boot, Spring Data JPA y MySQL.
 
 ## Cómo ejecutarla
 
-1. Inicializa la base de datos MySQL con los scripts de la carpeta `database/`:
+1. Define las variables de entorno en tu terminal antes de ejecutar el script de inicialización:
+   ```
+   export MYSQL_ROOT_PASSWORD=tu_password_root
+   export DB_DATABASE=lumina
+   ```
+   Luego inicializa la base de datos MySQL con los scripts de la carpeta `database/`:
    ```
    ./database/init-db.sh
    ```
