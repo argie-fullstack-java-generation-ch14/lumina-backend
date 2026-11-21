@@ -207,7 +207,7 @@ En todos los archivos de `model` y `util`, eliminar imports que hagan referencia
 - [x] Quitar imports de clases que ahora están en el mismo paquete `model`. ✅
 - [x] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`. ✅
 
-### Paso 5: Abrir el PR
+### Paso 5: Abrir el PR ✅
 
 Hacer commit y push, luego abrir un Pull Request hacia `refactor/capa-integration`.
 
@@ -217,7 +217,7 @@ git commit -m "feat(rol-a): migrar entidades, enum y Slutil a capas model y util
 git push origin refactor/capa-modelo
 ```
 
-### Paso 6: Hacer merge de la PR a la rama base
+### Paso 6: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-modelo` hacia `refactor/capa-integration`:
 
@@ -352,7 +352,7 @@ import com.lumina.repository.RoleRepository;
 - [x] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`. ✅
 - [x] Sin imports de `com.lumina.common` en archivos de este rol. ✅
 
-### Paso 6: Abrir el PR
+### Paso 6: Abrir el PR ✅
 
 ```bash
 git add .
@@ -360,7 +360,7 @@ git commit -m "feat(rol-b): migrar repositorios, excepciones, CORS y config a ca
 git push origin refactor/capa-persistencia
 ```
 
-### Paso 7: Hacer merge de la PR a la rama base
+### Paso 7: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-persistencia` hacia `refactor/capa-integration`:
 
@@ -478,7 +478,7 @@ git mv src/main/java/com/lumina/vela/CustomCandleService.java \
 - [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
 - [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
-### Paso 4: Abrir el PR
+### Paso 4: Abrir el PR ✅
 
 ```bash
 git add .
@@ -486,7 +486,7 @@ git commit -m "feat(rol-c): migrar servicios y DTOs de entrada a capas"
 git push origin refactor/capa-servicios
 ```
 
-### Paso 5: Hacer merge de la PR a la rama base
+### Paso 5: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-servicios` hacia `refactor/capa-integration`:
 
@@ -575,13 +575,13 @@ git mv src/main/java/com/lumina/vela/CustomCandleController.java \
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 5. Asegurar que el controlador solo dependa de `service` y `dto` (no importe repositorios directamente ni haga lógica de negocio).
 
-### Paso 3: Checklist del Rol D
+### Paso 3: Checklist del Rol D ✅
 
-- [ ] 4 controladores en `com.lumina.controller`.
-- [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
-- [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
+- [x] 4 controladores en `com.lumina.controller`. ✅
+- [x] 3 DTOs response + `ApiError` en `com.lumina.dto.response`. ✅
+- [x] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`. ✅
 
-### Paso 4: Abrir el PR
+### Paso 4: Abrir el PR ✅
 
 Hacer commit y push, luego abrir un Pull Request hacia `refactor/capa-integration`.
 
@@ -591,7 +591,7 @@ git commit -m "feat(rol-d): migrar controladores y DTOs de salida a capas"
 git push origin refactor/capa-api
 ```
 
-### Paso 5: Hacer merge de la PR a la rama base
+### Paso 5: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-api` hacia `refactor/capa-integration`:
 
@@ -788,14 +788,14 @@ Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 
 ### Checklist de Integración (Argie)
 
-- [ ] Unir PRs A→B→C→D en `refactor/capa-integration`.
-- [ ] Ejecutar build completo (`mvn -q -DskipTests package`).
-- [ ] Verificar que no queden paquetes viejos.
-- [ ] Verificar estructura de directorios esperada.
-- [ ] Ejecutar smoke test final (H2).
-- [ ] Validar que `README.md` coincida con la estructura final por capas.
+- [x] Unir PRs A→B→C→D en `refactor/capa-integration`. ✅
+- [x] Ejecutar build completo (`mvn -q -DskipTests package`). ✅
+- [x] Verificar que no queden paquetes viejos. ✅
+- [x] Verificar estructura de directorios esperada. ✅
+- [x] Ejecutar smoke test final (H2). ✅
+- [x] Validar que `README.md` coincida con la estructura final por capas. ✅
 - [ ] Mergear `refactor/capa-integration` a `main`.
-- [ ] Eliminar paquetes viejos una vez vacíos.
+- [x] Eliminar paquetes viejos una vez vacíos. ✅
 
 ---
 

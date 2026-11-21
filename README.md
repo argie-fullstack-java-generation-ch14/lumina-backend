@@ -27,23 +27,28 @@ Se borra al apagar la API y empieza sin productos.
 
 ## Estructura
 
-Los paquetes van por dominio, como se definió en `docs/DESARROLLO.md`:
+El backend usa una arquitectura por capas:
 
 ```
 com.lumina
-├── usuario/    Role, AppUser, registro y login
-├── producto/   Product (categoría como texto)
-├── vela/       CustomCandle (vela personalizada)
-├── pedido/     UserOrder, OrderItem (estado como enum)
-├── config/     CORS, BCrypt y roles básicos
-└── common/     excepciones y manejo de errores
+├── LuminaApiApplication.java
+├── config/        BCrypt y roles iniciales (DataInitializer, WebConfig)
+├── controller/    Controladores REST
+├── dto/
+│   ├── request/   DTOs de entrada
+│   └── response/  DTOs de salida (incluye ApiError)
+├── cors/          Configuración CORS (CorsConfig)
+├── exception/     Excepciones y GlobalExceptionHandler
+├── model/         Entidades JPA y enum OrderStatus
+├── repository/    Interfaces JpaRepository
+├── service/       Lógica de negocio
+└── util/          SlugUtil
 ```
 
 Entidades del MVP: `role`, `app_user`, `product`, `user_order`, `order_item` y `custom_candle`.
 No hay tablas para categorías, cupones, carrito, favoritos, contactos ni estados de pedido.
 
-Cada dominio tiene sus entidades, su repositorio (`JpaRepository`, que ya trae el CRUD completo),
-su servicio (la lógica) y su controlador (los endpoints).
+Flujo de dependencias: `controller → service → repository → model`. Los DTOs viven en `dto.request` y `dto.response`, y `exception` usa `dto.response.ApiError`.
 
 ## Endpoints
 
@@ -111,5 +116,5 @@ Códigos: `400` datos inválidos, `401` login incorrecto, `404` no existe, `409`
   (`demo-hash-...`), por eso no se puede iniciar sesión con ellos: crea una cuenta nueva con `/api/registro`.
 - Todavía no hay JWT. Los endpoints de administración (crear o borrar productos, cambiar estados de pedidos, etc.) están abiertos.
   Es el siguiente paso para restringirlos por rol.
-- CORS permite `localhost:5500` y `127.0.0.1:5500` (Live Server) y la página de GitHub Pages del equipo.
-  Si el frontend corre en otro puerto, se agrega en `config/WebConfig.java`.
+- CORS permite `localhost:3000`, `localhost:5500` y `127.0.0.1:5500` (dev) y la página de GitHub Pages del equipo.
+  Si el frontend corre en otro puerto, se agrega en `cors/CorsConfig.java`.

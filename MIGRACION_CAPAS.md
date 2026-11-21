@@ -390,10 +390,10 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
 - [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
-## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d)
-- [ ] 4 controladores en `com.lumina.controller`.
-- [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
-- [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
+## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d) ✅
+- [x] 4 controladores en `com.lumina.controller`. ✅
+- [x] 3 DTOs response + `ApiError` en `com.lumina.dto.response`. ✅
+- [x] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`. ✅
 
 ## Rol E: seguridad y autenticación · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-e)
 > **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
@@ -405,14 +405,14 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol
 
 **Argie (Integración y validación de documentación — además del Rol C)**
-- [ ] Unir PRs A→B→C→D en `refactor/capa-integration`.
-- [ ] Ejecutar build completo (`mvn -q -DskipTests package`).
-- [ ] Verificar que no queden paquetes viejos (`grep` de `usuario`, `producto`, `pedido`, `vela`, `common`).
-- [ ] Verificar estructura de directorios esperada.
-- [ ] Ejecutar smoke test final (H2).
-- [ ] Validar que `README.md` coincida con la estructura final por capas.
+- [x] Unir PRs A→B→C→D en `refactor/capa-integration`. ✅
+- [x] Ejecutar build completo (`mvn -q -DskipTests package`). ✅
+- [x] Verificar que no queden paquetes viejos (`grep` de `usuario`, `producto`, `pedido`, `vela`, `common`). ✅
+- [x] Verificar estructura de directorios esperada. ✅
+- [x] Ejecutar smoke test final (H2). ✅
+- [x] Validar que `README.md` coincida con la estructura final por capas. ✅
 - [ ] Mergear `refactor/capa-integration` a `main`.
-- [ ] Eliminar paquetes viejos una vez vacíos.
+- [x] Eliminar paquetes viejos una vez vacíos. ✅
 
 ## Integración y validación (Argie)
 
