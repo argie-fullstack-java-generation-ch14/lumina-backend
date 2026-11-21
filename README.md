@@ -5,25 +5,36 @@ API REST de Lumina hecha con Spring Boot, Spring Data JPA y MySQL.
 ## Qué necesitas
 
 - JDK 21
-- MySQL 8 (o ninguno, si pruebas con el perfil `h2`)
+- MySQL 8 (corriendo en tu entorno local o en Docker/Podman)
 - Maven (IntelliJ y VS Code con el Extension Pack for Java ya lo traen)
 
 ## Cómo ejecutarla
 
-1. En MySQL, ejecuta en este orden los scripts de la carpeta `data-base/` (están en la raíz del repo):
-   `01_schema.sql` (crea las tablas) y `02_seed.sql` (datos de ejemplo).
-2. Si tu usuario de MySQL no es `root` o la contraseña no es `root`, define las variables de entorno
-   `DB_USER` y `DB_PASSWORD`. Así no subimos contraseñas a GitHub.
-3. Desde esta carpeta (`backend/`):
+1. Inicializa la base de datos MySQL con los scripts de la carpeta `database/`:
+   ```
+   ./database/init-db.sh
+   ```
+   Esto ejecuta `01_schema.sql` (crea las tablas) y `02_seed.sql` (datos de ejemplo).
+   Asegúrate de que MySQL esté corriendo en `localhost:3306`.
 
+2. Copia `.env.example` a `.env` y ajusta los valores (usuario, contraseña, base de datos).
+   El archivo `.env` no se sube al repositorio (`gitignorado`).
+   Ejemplo mínimo:
+   ```
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASSWORD=tu_password
+   DB_DATABASE=lumina
+   MYSQL_ROOT_PASSWORD=tu_password_root
+   ```
+
+3. Desde esta carpeta (`lumina-backend/`):
    ```
    mvn spring-boot:run
    ```
 
    La API queda en `http://localhost:8080`.
-
-**Sin MySQL:** `mvn spring-boot:run -Dspring-boot.run.profiles=h2` usa una base de datos en memoria.
-Se borra al apagar la API y empieza sin productos.
 
 ## Estructura
 
