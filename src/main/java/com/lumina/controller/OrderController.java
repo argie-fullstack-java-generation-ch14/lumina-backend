@@ -1,7 +1,13 @@
-package com.lumina.pedido;
+package com.lumina.controller;
+
+import com.lumina.service.OrderService;
+import com.lumina.dto.request.OrderRequest;
+import com.lumina.dto.request.OrderStatusRequest;
+import com.lumina.dto.response.OrderResponse;
 
 import jakarta.validation.Valid;
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

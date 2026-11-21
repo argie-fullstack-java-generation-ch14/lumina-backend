@@ -1,5 +1,6 @@
-package com.lumina.usuario;
+package com.lumina.dto.response;
 
+import com.lumina.model.AppUser;
 import java.time.LocalDateTime;
 
 // Lo que la API devuelve de un usuario. Nunca incluye la contraseña.
