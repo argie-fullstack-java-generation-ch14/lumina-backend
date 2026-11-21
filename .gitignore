@@ -8,3 +8,6 @@ target/
 .classpath
 .project
 .settings/
+
+# Variables de entorno locales (no se suben)
+.env
