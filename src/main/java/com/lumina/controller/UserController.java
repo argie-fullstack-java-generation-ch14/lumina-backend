@@ -1,7 +1,14 @@
-package com.lumina.usuario;
+package com.lumina.controller;
+
+import com.lumina.service.UserService;
+import com.lumina.dto.request.RegisterRequest;
+import com.lumina.dto.request.LoginRequest;
+import com.lumina.dto.request.UpdateUserRequest;
+import com.lumina.dto.response.UserResponse;
 
 import jakarta.validation.Valid;
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

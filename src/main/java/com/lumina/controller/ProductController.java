@@ -1,7 +1,12 @@
-package com.lumina.producto;
+package com.lumina.controller;
+
+import com.lumina.service.ProductService;
+import com.lumina.model.Product;
+import com.lumina.dto.request.ProductRequest;
 
 import jakarta.validation.Valid;
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +33,8 @@ public class ProductController {
   // GET /api/productos?categoria=navidad&disponibles=true
   @GetMapping
   public List<Product> findAll(
-      @RequestParam(required = false) String categoria,
-      @RequestParam(defaultValue = "false") boolean disponibles) {
+          @RequestParam(required = false) String categoria,
+          @RequestParam(defaultValue = "false") boolean disponibles) {
     return productService.findAll(categoria, disponibles);
   }
 
