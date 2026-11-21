@@ -1,6 +1,6 @@
 # Capa de Seguridad y Autenticación (JWT) — Lumina Backend
 
-Este documento describe **exclusivamente** la implementación de la nueva capa de seguridad con autenticación JWT. Es **independiente** de la migración a arquitectura por capas (ya completada en `refactor/capa-integration`).
+Este documento describe **exclusivamente** la implementación de la nueva capa de seguridad con autenticación JWT. Es **independiente** de la migración a arquitectura por capas (ya completada y fusionada en `main`).
 
 ---
 
@@ -121,10 +121,10 @@ Nota: `database/02_seed.sql` tiene hashes falsos (`demo-hash-*`) que no sirven p
 
 ## 9. Git y PR
 
-Rama: `refactor/capa-seguridad` (desde `refactor/capa-integration`).
+Rama: `refactor/capa-seguridad` (desde `main`).
 
 ```bash
-git switch refactor/capa-integration
+git switch main
 git pull
 git switch -c refactor/capa-seguridad
 git push -u origin refactor/capa-seguridad
@@ -138,4 +138,4 @@ git commit -m "feat(rol-e): implementar autenticación JWT y proteger endpoints 
 git push origin refactor/capa-seguridad
 ```
 
-Luego abrir PR hacia `refactor/capa-integration`. El merge a `main` es acción manual (no parte de este documento).
+Luego abrir PR hacia `main`.
