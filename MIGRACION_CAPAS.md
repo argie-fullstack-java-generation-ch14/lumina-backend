@@ -390,10 +390,10 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
 - [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
-## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d)
-- [ ] 4 controladores en `com.lumina.controller`.
-- [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
-- [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
+## Rol D: controladores y DTOs de salida · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-d) ✅
+- [x] 4 controladores en `com.lumina.controller`. ✅
+- [x] 3 DTOs response + `ApiError` en `com.lumina.dto.response`. ✅
+- [x] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`. ✅
 
 ## Rol E: seguridad y autenticación · [Paso a paso detallado](MIGRACION_CAPAS_PASO_A_PASO.md#rol-e)
 > **Nota (Rol E / autenticación de usuario):** se implementará autenticación con **JWT** basándose en la clase del **20/11/2026 (JWT auth)**, siguiendo el ejemplo del proyecto demo del profesor.
@@ -405,14 +405,14 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 - [ ] Sin imports de `com.lumina.usuario`, `com.lumina.common` en archivos de este rol
 
 **Argie (Integración y validación de documentación — además del Rol C)**
-- [ ] Unir PRs A→B→C→D en `refactor/capa-integration`.
-- [ ] Ejecutar build completo (`mvn -q -DskipTests package`).
-- [ ] Verificar que no queden paquetes viejos (`grep` de `usuario`, `producto`, `pedido`, `vela`, `common`).
-- [ ] Verificar estructura de directorios esperada.
-- [ ] Ejecutar smoke test final (H2).
-- [ ] Validar que `README.md` coincida con la estructura final por capas.
+- [x] Unir PRs A→B→C→D en `refactor/capa-integration`. ✅
+- [x] Ejecutar build completo (`mvn -q -DskipTests package`). ✅
+- [x] Verificar que no queden paquetes viejos (`grep` de `usuario`, `producto`, `pedido`, `vela`, `common`). ✅
+- [x] Verificar estructura de directorios esperada. ✅
+- [x] Ejecutar smoke test final (H2). ✅
+- [x] Validar que `README.md` coincida con la estructura final por capas. ✅
 - [ ] Mergear `refactor/capa-integration` a `main`.
-- [ ] Eliminar paquetes viejos una vez vacíos.
+- [x] Eliminar paquetes viejos una vez vacíos. ✅
 
 ## Integración y validación (Argie)
 
@@ -421,7 +421,7 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 
 > **Importante:** Cada integrante abre su PR hacia la rama base `refactor/capa-integration`, **no hacia `main`**. La integración y el merge a `main` son tareas exclusivas de esta etapa final, a cargo de Argie.
 
-### Paso 1: Unir los PR en orden A → B → C → D → E
+### Paso 1: Unir los PR en orden A → B → C → D → E ✅
 
 1. Verificar que los PR de los roles A, B, C, D y E estén aprobados.
 2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D, luego E**.
@@ -431,29 +431,33 @@ La migración es **atómica para el compilador**: el build fallará hasta que to
 git switch refactor/capa-integration
 git pull
 ```
+- [x] Paso 1 completado: PRs A→B→C→D unidos en `refactor/capa-integration`. ✅
 
-### Paso 2: Ejecutar el build completo
+### Paso 2: Ejecutar el build completo ✅
 
 ```bash
 mvn -q -DskipTests package
 ```
+- [x] Paso 2 completado: build completo verde. ✅
 
-### Paso 3: Verificar que no queden paquetes viejos
+### Paso 3: Verificar que no queden paquetes viejos ✅
 
 ```bash
 grep -REn "package com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
 grep -REn "import com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
 ```
+- [x] Paso 3 completado: no quedan paquetes viejos. ✅
 
-### Paso 4: Verificar la estructura de directorios
+### Paso 4: Verificar la estructura de directorios ✅
 
 ```bash
 find src/main/java/com/lumina -maxdepth 3 -type d | sort
 ```
 
 Debe mostrar: `config`, `controller`, `dto`, `dto/request`, `dto/response`, `cors`, `exception`, `model`, `repository`, `service` (y opcionalmente `util`).
+- [x] Paso 4 completado: estructura de directorios correcta. ✅
 
-### Paso 5: Smoke test final (H2)
+### Paso 5: Smoke test final (H2) ✅
 
 1. Ejecutar la aplicación con perfil H2:
 
@@ -470,8 +474,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=h2 -Dspring-boot.run.arguments=--
    - `GET /api/productos?categoria=navidad`
 
 3. Resultado esperado: mismos valores funcionales que antes de la migración.
+- [x] Paso 5 completado: smoke test H2 aprobado. ✅
 
-### Paso 6: Validar la documentación (`README.md`)
+### Paso 6: Validar la documentación (`README.md`) ✅
 
 1. Abrir `README.md` en la raíz del backend.
 2. Verificar que la sección de estructura del proyecto refleje los nuevos paquetes por capas:
@@ -493,6 +498,7 @@ src/main/java/com/lumina
 
 3. Verificar que el flujo de dependencias entre capas esté documentado correctamente.
 4. Guardar los cambios si es necesario.
+- [x] Paso 6 completado: `README.md` validado contra la estructura final por capas. ✅
 
 ### Paso 7: Merge a `main`
 
@@ -504,8 +510,9 @@ git pull
 git merge --no-ff refactor/capa-integration
 git push origin main
 ```
+- [ ] Paso 7: Mergear `refactor/capa-integration` a `main` (pendiente, acción manual).
 
-### Paso 8: Limpieza — eliminar paquetes viejos
+### Paso 8: Limpieza — eliminar paquetes viejos ✅
 
 Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 
@@ -514,6 +521,7 @@ Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 - `pedido`
 - `vela`
 - `common`
+- [x] Paso 8 completado: paquetes viejos eliminados. ✅
 
 ## Rollback
 

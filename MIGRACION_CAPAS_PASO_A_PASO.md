@@ -148,7 +148,7 @@ git push -u origin refactor/capa-modelo
 | `com.lumina.vela.CustomCandle` | `com.lumina.model.CustomCandle` | `com.lumina.model` |
 | `com.lumina.*.SlugUtil` (si existe) | `com.lumina.util.SlugUtil` | `com.lumina.util` |
 
-### Paso 1: Mover las entidades y el enum al paquete `model`
+### Paso 1: Mover las entidades y el enum al paquete `model` ✅
 
 Para cada una de las 7 entidades/enum:
 
@@ -183,7 +183,7 @@ git mv src/main/java/com/lumina/vela/CustomCandle.java \
 
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido` ni `com.lumina.vela` dentro de los archivos de `model`.
 
-### Paso 2: Crear/mover `SlugUtil` al paquete `util`
+### Paso 2: Crear/mover `SlugUtil` al paquete `util` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/util/`.
 2. Mover `SlugUtil` con `git mv` (o crear el archivo si no existe en los paquetes viejos):
@@ -196,7 +196,7 @@ git mv <ruta-actual>/SlugUtil.java src/main/java/com/lumina/util/SlugUtil.java
 3. Actualizar el `package` a `com.lumina.util`.
 4. Revisar y corregir los imports de `SlugUtil` si hace referencia a clases de otros paquetes.
 
-### Paso 3: Revisar imports intra-paquete
+### Paso 3: Revisar imports intra-paquete ✅
 
 En todos los archivos de `model` y `util`, eliminar imports que hagan referencia a clases del mismo paquete (ya no son necesarios en Java).
 
@@ -207,7 +207,7 @@ En todos los archivos de `model` y `util`, eliminar imports que hagan referencia
 - [x] Quitar imports de clases que ahora están en el mismo paquete `model`. ✅
 - [x] Sin imports de `usuario`, `producto`, `pedido`, `vela` dentro de `model`/`util`. ✅
 
-### Paso 5: Abrir el PR
+### Paso 5: Abrir el PR ✅
 
 Hacer commit y push, luego abrir un Pull Request hacia `refactor/capa-integration`.
 
@@ -217,7 +217,7 @@ git commit -m "feat(rol-a): migrar entidades, enum y Slutil a capas model y util
 git push origin refactor/capa-modelo
 ```
 
-### Paso 6: Hacer merge de la PR a la rama base
+### Paso 6: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-modelo` hacia `refactor/capa-integration`:
 
@@ -266,7 +266,7 @@ git push -u origin refactor/capa-persistencia
 | `com.lumina.config.WebConfig` (PasswordEncoder) | `com.lumina.config.WebConfig` | `com.lumina.config` |
 | `com.lumina.config.DataInitializer` | `com.lumina.config.DataInitializer` | `com.lumina.config` |
 
-### Paso 1: Mover los repositorios al paquete `repository`
+### Paso 1: Mover los repositorios al paquete `repository` ✅
 
 1. Mover cada repositorio con `git mv`:
 
@@ -294,7 +294,7 @@ git mv src/main/java/com/lumina/vela/CustomCandleRepository.java \
 3. Actualizar el import de la entidad a `com.lumina.model.<Entidad>`.
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido` ni `com.lumina.vela`.
 
-### Paso 2: Mover excepciones y `GlobalExceptionHandler` al paquete `exception`
+### Paso 2: Mover excepciones y `GlobalExceptionHandler` al paquete `exception` ✅
 
 1. Mover cada excepción con `git mv`:
 
@@ -324,14 +324,14 @@ import com.lumina.dto.response.ApiError;
 
 4. Verificar que no queden imports de `com.lumina.common`.
 
-### Paso 3: Crear `CorsConfig` extrayendo CORS de `WebConfig`
+### Paso 3: Crear `CorsConfig` extrayendo CORS de `WebConfig` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/cors/`.
 2. Crear `CorsConfig.java` en `com.lumina.cors` con la lógica CORS extraída de `WebConfig`.
 3. En `WebConfig.java`, conservar solo el `@Bean PasswordEncoder` y eliminar la configuración CORS.
 4. Verificar que `WebConfig` quede en `com.lumina.config` con solo el bean de `PasswordEncoder`.
 
-### Paso 4: Actualizar `DataInitializer`
+### Paso 4: Actualizar `DataInitializer` ✅
 
 1. Abrir `src/main/java/com/lumina/config/DataInitializer.java`.
 2. Actualizar los imports a:
@@ -352,7 +352,7 @@ import com.lumina.repository.RoleRepository;
 - [x] `DataInitializer` importa `com.lumina.model.Role` y `com.lumina.repository.RoleRepository`. ✅
 - [x] Sin imports de `com.lumina.common` en archivos de este rol. ✅
 
-### Paso 6: Abrir el PR
+### Paso 6: Abrir el PR ✅
 
 ```bash
 git add .
@@ -360,7 +360,7 @@ git commit -m "feat(rol-b): migrar repositorios, excepciones, CORS y config a ca
 git push origin refactor/capa-persistencia
 ```
 
-### Paso 7: Hacer merge de la PR a la rama base
+### Paso 7: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-persistencia` hacia `refactor/capa-integration`:
 
@@ -407,7 +407,7 @@ git push -u origin refactor/capa-servicios
 | `com.lumina.pedido.OrderStatusRequest` | `com.lumina.dto.request.OrderStatusRequest` | `com.lumina.dto.request` |
 | `com.lumina.vela.CustomCandleRequest` | `com.lumina.dto.request.CustomCandleRequest` | `com.lumina.dto.request` |
 
-### Paso 1: Mover los DTOs de entrada al paquete `dto/request`
+### Paso 1: Mover los DTOs de entrada al paquete `dto/request` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/dto/request/`.
 2. Mover cada DTO con `git mv`:
@@ -442,7 +442,7 @@ git mv src/main/java/com/lumina/vela/CustomCandleRequest.java \
 4. Revisar y corregir los imports que hagan referencia a `com.lumina.model` (entidades) si es necesario.
 5. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 
-### Paso 2: Mover los servicios al paquete `service`
+### Paso 2: Mover los servicios al paquete `service` ✅
 
 1. Mover cada servicio con `git mv`:
 
@@ -478,7 +478,7 @@ git mv src/main/java/com/lumina/vela/CustomCandleService.java \
 - [x] Imports corregidos a `model`, `repository`, `exception`, `dto.request`, `dto.response`, `util`. ✅
 - [x] Sin imports de `usuario`, `producto`, `pedido`, `vela`, `common`. ✅
 
-### Paso 4: Abrir el PR
+### Paso 4: Abrir el PR ✅
 
 ```bash
 git add .
@@ -486,7 +486,7 @@ git commit -m "feat(rol-c): migrar servicios y DTOs de entrada a capas"
 git push origin refactor/capa-servicios
 ```
 
-### Paso 5: Hacer merge de la PR a la rama base
+### Paso 5: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-servicios` hacia `refactor/capa-integration`:
 
@@ -528,7 +528,7 @@ git push -u origin refactor/capa-api
 | `com.lumina.pedido.OrderResponse` | `com.lumina.dto.response.OrderResponse` | `com.lumina.dto.response` |
 | `com.lumina.common.ApiError` | `com.lumina.dto.response.ApiError` | `com.lumina.dto.response` |
 
-### Paso 1: Mover los DTOs de salida y `ApiError` al paquete `dto/response`
+### Paso 1: Mover los DTOs de salida y `ApiError` al paquete `dto/response` ✅
 
 1. Crear el directorio `src/main/java/com/lumina/dto/response/`.
 2. Mover cada archivo con `git mv`:
@@ -548,7 +548,7 @@ git mv src/main/java/com/lumina/common/ApiError.java \
 4. Revisar y corregir los imports que hagan referencia a `com.lumina.model` si es necesario.
 5. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 
-### Paso 2: Mover los controladores al paquete `controller`
+### Paso 2: Mover los controladores al paquete `controller` ✅
 
 1. Mover cada controlador con `git mv`:
 
@@ -575,13 +575,13 @@ git mv src/main/java/com/lumina/vela/CustomCandleController.java \
 4. Verificar que no queden imports de `com.lumina.usuario`, `com.lumina.producto`, `com.lumina.pedido`, `com.lumina.vela` ni `com.lumina.common`.
 5. Asegurar que el controlador solo dependa de `service` y `dto` (no importe repositorios directamente ni haga lógica de negocio).
 
-### Paso 3: Checklist del Rol D
+### Paso 3: Checklist del Rol D ✅
 
-- [ ] 4 controladores en `com.lumina.controller`.
-- [ ] 3 DTOs response + `ApiError` en `com.lumina.dto.response`.
-- [ ] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`.
+- [x] 4 controladores en `com.lumina.controller`. ✅
+- [x] 3 DTOs response + `ApiError` en `com.lumina.dto.response`. ✅
+- [x] Imports corregidos a `service`, `dto.request`, `dto.response`, `model`. ✅
 
-### Paso 4: Abrir el PR
+### Paso 4: Abrir el PR ✅
 
 Hacer commit y push, luego abrir un Pull Request hacia `refactor/capa-integration`.
 
@@ -591,7 +591,7 @@ git commit -m "feat(rol-d): migrar controladores y DTOs de salida a capas"
 git push origin refactor/capa-api
 ```
 
-### Paso 5: Hacer merge de la PR a la rama base
+### Paso 5: Hacer merge de la PR a la rama base ✅
 
 Una vez aprobada la PR, unir la rama `refactor/capa-api` hacia `refactor/capa-integration`:
 
@@ -692,7 +692,7 @@ git push origin refactor/capa-integration
 
 > **Importante:** Cada integrante abre su PR hacia la rama base `refactor/capa-integration`, **no hacia `main`**. La integración y el merge a `main` son tareas exclusivas de esta etapa final, a cargo de Argie.
 
-### Paso 1: Unir los PR en orden A → B → C → D → E
+### Paso 1: Unir los PR en orden A → B → C → D → E ✅
 
 1. Verificar que los PR de los roles A, B, C, D y E estén aprobados.
 2. Mergear cada PR hacia `refactor/capa-integration` en el orden recomendado: **A, luego B, luego C, luego D, luego E**.
@@ -702,29 +702,33 @@ git push origin refactor/capa-integration
 git switch refactor/capa-integration
 git pull
 ```
+- [x] Paso 1 completado: PRs A→B→C→D unidos en `refactor/capa-integration`. ✅
 
-### Paso 2: Ejecutar el build completo
+### Paso 2: Ejecutar el build completo ✅
 
 ```bash
 mvn -q -DskipTests package
 ```
+- [x] Paso 2 completado: build completo verde. ✅
 
-### Paso 3: Verificar que no queden paquetes viejos
+### Paso 3: Verificar que no queden paquetes viejos ✅
 
 ```bash
 grep -REn "package com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
 grep -REn "import com\.lumina\.(usuario|producto|pedido|vela|common)" src/main/java || true
 ```
+- [x] Paso 3 completado: no quedan paquetes viejos. ✅
 
-### Paso 4: Verificar la estructura de directorios
+### Paso 4: Verificar la estructura de directorios ✅
 
 ```bash
 find src/main/java/com/lumina -maxdepth 3 -type d | sort
 ```
 
 Debe mostrar: `config`, `controller`, `dto`, `dto/request`, `dto/response`, `cors`, `exception`, `model`, `repository`, `service` (y opcionalmente `util`).
+- [x] Paso 4 completado: estructura de directorios correcta. ✅
 
-### Paso 5: Smoke test final (H2)
+### Paso 5: Smoke test final (H2) ✅
 
 1. Ejecutar la aplicación con perfil H2:
 
@@ -741,8 +745,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=h2 -Dspring-boot.run.arguments=--
    - `GET /api/productos?categoria=navidad`
 
 3. Resultado esperado: mismos valores funcionales que antes de la migración.
+- [x] Paso 5 completado: smoke test H2 aprobado. ✅
 
-### Paso 6: Validar la documentación (`README.md`)
+### Paso 6: Validar la documentación (`README.md`) ✅
 
 1. Abrir `README.md` en la raíz del backend.
 2. Verificar que la sección de estructura del proyecto refleje los nuevos paquetes por capas:
@@ -764,6 +769,7 @@ src/main/java/com/lumina
 
 3. Verificar que el flujo de dependencias entre capas esté documentado correctamente.
 4. Guardar los cambios si es necesario.
+- [x] Paso 6 completado: `README.md` validado contra la estructura final por capas. ✅
 
 ### Paso 7: Merge a `main`
 
@@ -775,8 +781,9 @@ git pull
 git merge --no-ff refactor/capa-integration
 git push origin main
 ```
+- [ ] Paso 7: Mergear `refactor/capa-integration` a `main` (pendiente, acción manual).
 
-### Paso 8: Limpieza — eliminar paquetes viejos
+### Paso 8: Limpieza — eliminar paquetes viejos ✅
 
 Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 
@@ -785,17 +792,18 @@ Una vez que todos los paquetes estén vacíos, eliminar los paquetes antiguos:
 - `pedido`
 - `vela`
 - `common`
+- [x] Paso 8 completado: paquetes viejos eliminados. ✅
 
 ### Checklist de Integración (Argie)
 
-- [ ] Unir PRs A→B→C→D en `refactor/capa-integration`.
-- [ ] Ejecutar build completo (`mvn -q -DskipTests package`).
-- [ ] Verificar que no queden paquetes viejos.
-- [ ] Verificar estructura de directorios esperada.
-- [ ] Ejecutar smoke test final (H2).
-- [ ] Validar que `README.md` coincida con la estructura final por capas.
+- [x] Unir PRs A→B→C→D en `refactor/capa-integration`. ✅
+- [x] Ejecutar build completo (`mvn -q -DskipTests package`). ✅
+- [x] Verificar que no queden paquetes viejos. ✅
+- [x] Verificar estructura de directorios esperada. ✅
+- [x] Ejecutar smoke test final (H2). ✅
+- [x] Validar que `README.md` coincida con la estructura final por capas. ✅
 - [ ] Mergear `refactor/capa-integration` a `main`.
-- [ ] Eliminar paquetes viejos una vez vacíos.
+- [x] Eliminar paquetes viejos una vez vacíos. ✅
 
 ---
 
