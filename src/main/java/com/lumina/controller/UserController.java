@@ -2,7 +2,6 @@ package com.lumina.controller;
 
 import com.lumina.service.UserService;
 import com.lumina.dto.request.RegisterRequest;
-import com.lumina.dto.request.LoginRequest;
 import com.lumina.dto.request.UpdateUserRequest;
 import com.lumina.dto.response.UserResponse;
 
@@ -35,12 +34,6 @@ public class UserController {
   @ResponseStatus(HttpStatus.CREATED)
   public UserResponse register(@Valid @RequestBody RegisterRequest request) {
     return userService.register(request);
-  }
-
-  // POST /api/login
-  @PostMapping("/login")
-  public UserResponse login(@Valid @RequestBody LoginRequest request) {
-    return userService.login(request);
   }
 
   // GET /api/usuarios
