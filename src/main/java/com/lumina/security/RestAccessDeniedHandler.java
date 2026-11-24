@@ -1,5 +1,6 @@
 package com.lumina.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lumina.dto.response.ApiError;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
+
+  private final ObjectMapper objectMapper;
+
+  public RestAccessDeniedHandler(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 
   @Override
   public void handle(
@@ -31,6 +38,6 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         "No autorizado: rol insuficiente para acceder a este recurso",
         List.of());
 
-    response.getWriter().write(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(error));
+    response.getWriter().write(objectMapper.writeValueAsString(error));
   }
 }

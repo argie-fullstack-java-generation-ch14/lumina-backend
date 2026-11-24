@@ -1,5 +1,6 @@
 package com.lumina.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lumina.dto.response.ApiError;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+  private final ObjectMapper objectMapper;
+
+  public RestAuthenticationEntryPoint(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 
   @Override
   public void commence(
@@ -31,6 +38,6 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         "No autenticado: token faltante o inválido",
         List.of());
 
-    response.getWriter().write(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(error));
+    response.getWriter().write(objectMapper.writeValueAsString(error));
   }
 }
