@@ -22,7 +22,7 @@ public class CorsConfig implements WebMvcConfigurer {
             "http://127.0.0.1:5500",
             "http://localhost:3000",
             "http://127.0.0.1:3000",
-            "https://argie-fullstack-java-generation-ch14.github.io")
+            "https://black-mountain-99c5.nayis2306.workers.dev/")
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
         .allowedHeaders("*");
   }
